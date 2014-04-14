@@ -1,0 +1,473 @@
+#include "ROV.h"
+
+ float*  vect;
+uint32_t vec;
+uint8_t error_can;
+uint8_t counter;
+//__IO Stream Stream_Tab[16];
+
+int (*ptr[256]);
+
+void* Set_Union_Float(uint8_t* tab1,uint8_t tab2[4]) //This function is used to set union float from CAN
+{
+  tab1[0] = tab2[0];
+  tab1[1] = tab2[1];
+  tab1[2] = tab2[2];
+  tab1[3] = tab2[3];
+  
+  return 0;
+}
+
+void* Set_Union_INT16(uint8_t* tab1,uint8_t tab2[2]) //This function is used to set union float from CAN
+{
+  tab1[0] = tab2[0];
+  tab1[1] = tab2[1];
+  
+  return 0;
+}
+
+ptr[1] = Set_Union_Float;
+//*ptr[1] = Set_Union_INT16;
+
+
+
+void ROV_Stream_Init(ROV_Struct* ROV)
+{
+  //memcpy(ROV->Stream_Tab[0].StrPtr,(ROV->Motion.Accelx.integer),(sizeof(ROV->Motion.Accelx.integer)));
+ ROV->Stream_Tab[0].StrPtr = (ROV->Motion.Accelx.integer);
+ ROV->Stream_Tab[1].StrPtr = (ROV->Motion.Accely.integer);
+ ROV->Stream_Tab[2].StrPtr = (ROV->Motion.Accelz.integer);
+ ROV->Stream_Tab[3].StrPtr = (ROV->Motion.Depth.integer);
+ ROV->Stream_Tab[4].StrPtr = (ROV->Motion.Gyrox.integer);
+ ROV->Stream_Tab[5].StrPtr = (ROV->Motion.Gyroy.integer);
+ ROV->Stream_Tab[6].StrPtr = (ROV->Motion.Gyroz.integer);
+ ROV->Stream_Tab[7].StrPtr = (ROV->Motion.Roll.integer);
+ ROV->Stream_Tab[8].StrPtr = (ROV->Motion.Pitch.integer);
+ ROV->Stream_Tab[9].StrPtr = (ROV->Motion.Yaw.integer);
+
+ for(counter = 0;counter<16;counter++)
+ {
+   ROV->Stream_Tab[counter].State = 0;
+ }
+  
+  
+}
+
+void ROV_Init(ROV_Struct* ROV) //fonction d'initialisation du ROV
+{
+  AIOP_init(&(ROV->AIO));
+  TIM_Init();
+  RS485_init();
+  CAN_init();
+  Lighting_init();
+  THRUSTER_init();
+  ROV_Stream_Init(ROV);
+}
+
+
+
+
+void ROV_Routine(ROV_Struct* ROV)
+{   
+}
+
+void ROV_DataUpdate(ROV_Struct* ROV) //This function updates the values of variables called by timer interrupt
+{
+  ROV->Motion.Roll.floating_number = ROV->AIO.buffers.Current_50HZtrame.Roll.floating_number; //update Roll
+  ROV->Motion.Pitch.floating_number = ROV->AIO.buffers.Current_50HZtrame.Pitch.floating_number; //update Pitch
+  ROV->Motion.Yaw.floating_number = ROV->AIO.buffers.Current_50HZtrame.Yaw.floating_number; //update Yaw
+  ROV->Motion.Accelx.floating_number = ROV->AIO.buffers.Current_50HZtrame.Accelx.floating_number; //update accelx
+  ROV->Motion.Accely.floating_number = ROV->AIO.buffers.Current_50HZtrame.Accely.floating_number; //update accely
+  ROV->Motion.Accelz.floating_number = ROV->AIO.buffers.Current_50HZtrame.Accelz.floating_number; //update accelz
+  ROV->Motion.Gyrox.floating_number = ROV->AIO.buffers.Current_50HZtrame.Gyrox.floating_number; //update gyrox
+  ROV->Motion.Gyroy.floating_number = ROV->AIO.buffers.Current_50HZtrame.Gyroy.floating_number; //update gyroy
+  ROV->Motion.Gyroz.floating_number = ROV->AIO.buffers.Current_50HZtrame.Gyroz.floating_number; //update gyroz
+  ROV->Motion.Depth.floating_number = ROV->AIO.buffers.Current_10HZtrame.Pressure.floating_number; //update depth
+  
+}
+
+void ROV_Stream_DOF(ROV_Struct ROV) //Streaming DOFs to command station at 50Hz frequency, called in stm32f4xx_it.c at TIM11 interrupt
+{ 
+  for(int o = 0;o<16;o++)
+  {
+    if(ROV.Stream_Tab[o].State ==1)
+    {
+      uint8_t message_DOF[4];
+      //ptr[0](message_DOF,(ROV.Stream_Tab[o].StrPtr));
+      Set_Union_Float(message_DOF,(ROV.Stream_Tab[o].StrPtr));
+      error_can = CAN_send(message_DOF,0x8C); //Send Roll value
+    }
+}
+}
+
+void ROV_JoySt_receive(ROV_Struct* ROV,CanRxMsg RxMessage) //Reception des valeurs du joystick
+{
+  switch(RxMessage.ExtId) //selon l'extended ID
+  {
+  case CAN_JOY_XYRZ: //les valeurs de X, Y et Rz
+    ROV->joyst.x_axis.integer8[0] = RxMessage.Data[0];
+    ROV->joyst.x_axis.integer8[1] = RxMessage.Data[1];
+    ROV->joyst.y_axis.integer8[0] = RxMessage.Data[2];
+    ROV->joyst.y_axis.integer8[1] = RxMessage.Data[3];
+    ROV->joyst.rz_rotation.integer8[0] = RxMessage.Data[4];
+    ROV->joyst.rz_rotation.integer8[1] = RxMessage.Data[5];
+    break;
+    
+  case CAN_JOY_TH1TH2: //les valeurs de throttle1 et throttle2
+    ROV->joyst.th_1.integer8[0] = RxMessage.Data[0];
+    ROV->joyst.th_1.integer8[1] = RxMessage.Data[1];
+    ROV->joyst.th_2.integer8[0] = RxMessage.Data[2];
+    ROV->joyst.th_2.integer8[1] = RxMessage.Data[3];
+    break;
+    
+  case CAN_JOY_BUTTON: //les valeurs des boutons
+    ROV->joyst.buttons.integer8[0] = RxMessage.Data[0];
+    ROV->joyst.buttons.integer8[1] = RxMessage.Data[1];
+    break;
+    
+  }
+}
+
+void ROV_CommandSt_receive(ROV_Struct* ROV,CanRxMsg RxMessage) //Reception d'une trame de commande
+{ 
+ 
+   switch(RxMessage.StdId) //selon l'ID standard
+  {
+  case CAN_CMD_INIT: //commande d'initialisation du véhicule
+    if((RxMessage.Data&&0xFFFF)== 0xFAFE) //champ de donnée valide
+    {
+      ROV_Init(ROV);
+    }
+    break;
+    
+  case CAN_CMD_THSET1234: //commande de forçage des thrusters 1..4 
+    ROV->Propulsion[0].speed.integer8[0] = RxMessage.Data[0];
+    ROV->Propulsion[0].speed.integer8[1] = RxMessage.Data[1];
+    ROV->Propulsion[1].speed.integer8[0] = RxMessage.Data[2];
+    ROV->Propulsion[1].speed.integer8[1] = RxMessage.Data[3];
+    ROV->Propulsion[2].speed.integer8[0] = RxMessage.Data[4];
+    ROV->Propulsion[2].speed.integer8[1] = RxMessage.Data[5];
+    ROV->Propulsion[3].speed.integer8[0] = RxMessage.Data[6];
+    ROV->Propulsion[3].speed.integer8[1] = RxMessage.Data[7];
+    break;
+    
+  case CAN_CMD_THSET56: //commande de forçage des thrusters 5 et 6
+    ROV->Propulsion[4].speed.integer8[0] = RxMessage.Data[0];
+    ROV->Propulsion[4].speed.integer8[1] = RxMessage.Data[1];
+    ROV->Propulsion[5].speed.integer8[0] = RxMessage.Data[2];
+    ROV->Propulsion[5].speed.integer8[1] = RxMessage.Data[3];
+    break;
+    
+  case CAN_CMD_KP: //commande pour changer le gain Kp d'un PID
+    if(RxMessage.Data[0]==0x00) //PID qui gère l'axe X
+    {
+      ROV->PID[0].Kp.integer[0] = RxMessage.Data[1];
+      ROV->PID[0].Kp.integer[1] = RxMessage.Data[2];
+      ROV->PID[0].Kp.integer[2] = RxMessage.Data[3];
+      ROV->PID[0].Kp.integer[3] = RxMessage.Data[4];
+  }
+    else if(RxMessage.Data[0]==0x01) //PID qui gère l'axe Y
+      {
+      ROV->PID[1].Kp.integer[0] = RxMessage.Data[1];
+      ROV->PID[1].Kp.integer[1] = RxMessage.Data[2];
+      ROV->PID[1].Kp.integer[2] = RxMessage.Data[3];
+      ROV->PID[1].Kp.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x02) //PID qui gère l'axe Z
+    {
+      ROV->PID[2].Kp.integer[0] = RxMessage.Data[1];
+      ROV->PID[2].Kp.integer[1] = RxMessage.Data[2];
+      ROV->PID[2].Kp.integer[2] = RxMessage.Data[3];
+      ROV->PID[2].Kp.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x03) //PID qui gère la rotation Roll
+    {
+      ROV->PID[3].Kp.integer[0] = RxMessage.Data[1];
+      ROV->PID[3].Kp.integer[1] = RxMessage.Data[2];
+      ROV->PID[3].Kp.integer[2] = RxMessage.Data[3];
+      ROV->PID[3].Kp.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x04) //PID qui gère la rotation Yaw
+    {
+      ROV->PID[4].Kp.integer[0] = RxMessage.Data[1];
+      ROV->PID[4].Kp.integer[1] = RxMessage.Data[2];
+      ROV->PID[4].Kp.integer[2] = RxMessage.Data[3];
+      ROV->PID[4].Kp.integer[3] = RxMessage.Data[4]; 
+  }
+    break;
+    
+    case CAN_CMD_KD: //commande pour changer le gain Kd d'un PID
+    if(RxMessage.Data[0]==0x00) //PID qui gère l'axe X
+    {
+      ROV->PID[0].Kd.integer[0] = RxMessage.Data[1];
+      ROV->PID[0].Kd.integer[1] = RxMessage.Data[2];
+      ROV->PID[0].Kd.integer[2] = RxMessage.Data[3];
+      ROV->PID[0].Kd.integer[3] = RxMessage.Data[4];
+  }
+    else if(RxMessage.Data[0]==0x01) //PID qui gère l'axe Y
+      {
+      ROV->PID[1].Kd.integer[0] = RxMessage.Data[1];
+      ROV->PID[1].Kd.integer[1] = RxMessage.Data[2];
+      ROV->PID[1].Kd.integer[2] = RxMessage.Data[3];
+      ROV->PID[1].Kd.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x02) //PID qui gère l'axe Z
+    {
+      ROV->PID[2].Kd.integer[0] = RxMessage.Data[1];
+      ROV->PID[2].Kd.integer[1] = RxMessage.Data[2];
+      ROV->PID[2].Kd.integer[2] = RxMessage.Data[3];
+      ROV->PID[2].Kd.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x03) //PID qui gère la rotation Roll
+    {
+      ROV->PID[3].Kd.integer[0] = RxMessage.Data[1];
+      ROV->PID[3].Kd.integer[1] = RxMessage.Data[2];
+      ROV->PID[3].Kd.integer[2] = RxMessage.Data[3];
+      ROV->PID[3].Kd.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x04) //PID qui gère la rotation Yaw
+    {
+      ROV->PID[4].Kd.integer[0] = RxMessage.Data[1];
+      ROV->PID[4].Kd.integer[1] = RxMessage.Data[2];
+      ROV->PID[4].Kd.integer[2] = RxMessage.Data[3];
+      ROV->PID[4].Kd.integer[3] = RxMessage.Data[4]; 
+  }
+    break;
+    
+    case CAN_CMD_KI: //commande pour changer le gain Ki d'un PID
+    if(RxMessage.Data[0]==0x00) //PID qui gère l'axe X
+    {
+      ROV->PID[0].Ki.integer[0] = RxMessage.Data[1];
+      ROV->PID[0].Ki.integer[1] = RxMessage.Data[2];
+      ROV->PID[0].Ki.integer[2] = RxMessage.Data[3];
+      ROV->PID[0].Ki.integer[3] = RxMessage.Data[4];
+  }
+    else if(RxMessage.Data[0]==0x01) //PID qui gère l'axe Y
+      {
+      ROV->PID[1].Ki.integer[0] = RxMessage.Data[1];
+      ROV->PID[1].Ki.integer[1] = RxMessage.Data[2];
+      ROV->PID[1].Ki.integer[2] = RxMessage.Data[3];
+      ROV->PID[1].Ki.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x02) //PID qui gère l'axe Z
+    {
+      ROV->PID[2].Ki.integer[0] = RxMessage.Data[1];
+      ROV->PID[2].Ki.integer[1] = RxMessage.Data[2];
+      ROV->PID[2].Ki.integer[2] = RxMessage.Data[3];
+      ROV->PID[2].Ki.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x03) //PID qui gère la rotation Roll
+    {
+      ROV->PID[3].Ki.integer[0] = RxMessage.Data[1];
+      ROV->PID[3].Ki.integer[1] = RxMessage.Data[2];
+      ROV->PID[3].Ki.integer[2] = RxMessage.Data[3];
+      ROV->PID[3].Ki.integer[3] = RxMessage.Data[4]; 
+  }
+    else if(RxMessage.Data[0]==0x04) //PID qui gère la rotation Yaw
+    {
+      ROV->PID[4].Ki.integer[0] = RxMessage.Data[1];
+      ROV->PID[4].Ki.integer[1] = RxMessage.Data[2];
+      ROV->PID[4].Ki.integer[2] = RxMessage.Data[3];
+      ROV->PID[4].Ki.integer[3] = RxMessage.Data[4]; 
+  }
+    break;
+}
+}
+
+void ROV_Req_Val(ROV_Struct ROV,CanRxMsg RxMessage)
+{
+  switch(RxMessage.StdId) //selon l'ID standard
+  {uint8_t rep_requete[5];
+  case CAN_KP_GET: //on veut obtenir la valeur de Kp
+    if((RxMessage.Data[0]&&0xFF)==0x00) //on veut récupérer Kp qui gère l'axe des X
+        {
+          rep_requete[0] = 0x00;
+          rep_requete[1] = ROV.PID[0].Kp.integer[0];
+          rep_requete[2] = ROV.PID[0].Kp.integer[1];
+          rep_requete[3] = ROV.PID[0].Kp.integer[2];
+          rep_requete[4] = ROV.PID[0].Kp.integer[3];
+          error_can = CAN_send(rep_requete,0x4F); //Send Kp value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x01) //on veut récupérer Kp qui gère l'axe des Y
+        {
+          rep_requete[0] = 0x01;
+          rep_requete[1] = ROV.PID[1].Kp.integer[0];
+          rep_requete[2] = ROV.PID[1].Kp.integer[1];
+          rep_requete[3] = ROV.PID[1].Kp.integer[2];
+          rep_requete[4] = ROV.PID[1].Kp.integer[3];
+          error_can = CAN_send(rep_requete,0x4F); //Send Kp value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x02) //on veut récupérer Kp qui gère l'axe des Z
+        {
+          rep_requete[0] = 0x02;
+          rep_requete[1] = ROV.PID[2].Kp.integer[0];
+          rep_requete[2] = ROV.PID[2].Kp.integer[1];
+          rep_requete[3] = ROV.PID[2].Kp.integer[2];
+          rep_requete[4] = ROV.PID[2].Kp.integer[3];
+          error_can = CAN_send(rep_requete,0x4F); //Send Kp value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x03) //on veut récupérer Kp qui gère Roll
+        {
+          rep_requete[0] = 0x03;
+          rep_requete[1] = ROV.PID[3].Kp.integer[0];
+          rep_requete[2] = ROV.PID[3].Kp.integer[1];
+          rep_requete[3] = ROV.PID[3].Kp.integer[2];
+          rep_requete[4] = ROV.PID[3].Kp.integer[3];
+          error_can = CAN_send(rep_requete,0x4F); //Send Kp value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x04) //on veut récupérer Kp qui gère Yaw
+        {
+          rep_requete[0] = 0x04;
+          rep_requete[1] = ROV.PID[4].Kp.integer[0];
+          rep_requete[2] = ROV.PID[4].Kp.integer[1];
+          rep_requete[3] = ROV.PID[4].Kp.integer[2];
+          rep_requete[4] = ROV.PID[4].Kp.integer[3];
+          error_can = CAN_send(rep_requete,0x4F); //Send Kp value
+        }
+         
+  case CAN_KI_GET: //On veut récupérer KI
+    if((RxMessage.Data[0]&&0xFF)==0x00) //on veut récupérer Ki qui gère l'axe des X
+        {
+          rep_requete[0] = 0x00;
+          rep_requete[1] = ROV.PID[0].Ki.integer[0];
+          rep_requete[2] = ROV.PID[0].Ki.integer[1];
+          rep_requete[3] = ROV.PID[0].Ki.integer[2];
+          rep_requete[4] = ROV.PID[0].Ki.integer[3];
+          error_can = CAN_send(rep_requete,0x50); //Send Ki value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x01) //on veut récupérer Ki qui gère l'axe des Y
+        {
+          rep_requete[0] = 0x01;
+          rep_requete[1] = ROV.PID[1].Ki.integer[0];
+          rep_requete[2] = ROV.PID[1].Ki.integer[1];
+          rep_requete[3] = ROV.PID[1].Ki.integer[2];
+          rep_requete[4] = ROV.PID[1].Ki.integer[3];
+          error_can = CAN_send(rep_requete,0x50); //Send Ki value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x02) //on veut récupérer Kp qui gère l'axe des Z
+        {
+          rep_requete[0] = 0x02;
+          rep_requete[1] = ROV.PID[2].Ki.integer[0];
+          rep_requete[2] = ROV.PID[2].Ki.integer[1];
+          rep_requete[3] = ROV.PID[2].Ki.integer[2];
+          rep_requete[4] = ROV.PID[2].Ki.integer[3];
+          error_can = CAN_send(rep_requete,0x50); //Send Ki value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x03) //on veut récupérer Ki qui gère Roll
+        {
+          rep_requete[0] = 0x03;
+          rep_requete[1] = ROV.PID[3].Ki.integer[0];
+          rep_requete[2] = ROV.PID[3].Ki.integer[1];
+          rep_requete[3] = ROV.PID[3].Ki.integer[2];
+          rep_requete[4] = ROV.PID[3].Ki.integer[3];
+          error_can = CAN_send(rep_requete,0x50); //Send Ki value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x04) //on veut récupérer Ki qui gère Yaw
+        {
+          rep_requete[0] = ROV.PID[4].Ki.integer[0];
+          rep_requete[1] = ROV.PID[4].Ki.integer[0];
+          rep_requete[2] = ROV.PID[4].Ki.integer[1];
+          rep_requete[3] = ROV.PID[4].Ki.integer[2];
+          rep_requete[4] = ROV.PID[4].Ki.integer[3];
+          error_can = CAN_send(rep_requete,0x50); //Send Ki value
+        }
+        
+  case CAN_KD_GET: //On veut récupérer KD
+    if((RxMessage.Data[0]&&0xFF)==0x00) //on veut récupérer Kd qui gère l'axe des X
+        {
+          rep_requete[0] = 0x00;
+          rep_requete[1] = ROV.PID[0].Kd.integer[0];
+          rep_requete[2] = ROV.PID[0].Kd.integer[1];
+          rep_requete[3] = ROV.PID[0].Kd.integer[2];
+          rep_requete[4] = ROV.PID[0].Kd.integer[3];
+          error_can = CAN_send(rep_requete,0x51); //Send Kd value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x01) //on veut récupérer Kd qui gère l'axe des Y
+        {
+          rep_requete[0] = 0x01;
+          rep_requete[1] = ROV.PID[1].Kd.integer[0];
+          rep_requete[2] = ROV.PID[1].Kd.integer[1];
+          rep_requete[3] = ROV.PID[1].Kd.integer[2];
+          rep_requete[4] = ROV.PID[1].Kd.integer[3];
+          error_can = CAN_send(rep_requete,0x51); //Send Kd value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x02) //on veut récupérer Kd qui gère l'axe des Z
+        {
+          rep_requete[0] = 0x02;
+          rep_requete[1] = ROV.PID[2].Kd.integer[0];
+          rep_requete[2] = ROV.PID[2].Kd.integer[1];
+          rep_requete[3] = ROV.PID[2].Kd.integer[2];
+          rep_requete[4] = ROV.PID[2].Kd.integer[3];
+          error_can = CAN_send(rep_requete,0x51); //Send Kd value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x03) //on veut récupérer Kd qui gère Roll
+        {
+          rep_requete[0] = 0x03;
+          rep_requete[1] = ROV.PID[3].Kd.integer[0];
+          rep_requete[2] = ROV.PID[3].Kd.integer[1];
+          rep_requete[3] = ROV.PID[3].Kd.integer[2];
+          rep_requete[4] = ROV.PID[3].Kd.integer[3];
+          error_can = CAN_send(rep_requete,0x51); //Send Kd value
+        }
+        else if ((RxMessage.Data[0]&&0xFF)==0x04) //on veut récupérer Kd qui gère Yaw
+        {
+          rep_requete[0] = ROV.PID[4].Kd.integer[0];
+          rep_requete[1] = ROV.PID[4].Kd.integer[0];
+          rep_requete[2] = ROV.PID[4].Kd.integer[1];
+          rep_requete[3] = ROV.PID[4].Kd.integer[2];
+          rep_requete[4] = ROV.PID[4].Kd.integer[3];
+          error_can = CAN_send(rep_requete,0x51); //Send Kd value
+        }
+    case CAN_GYROX_GET: //On veut récupérer la valeur de Gyro X
+          rep_requete[0] = ROV.PID[4].Kd.integer[0];
+          rep_requete[1] = ROV.PID[4].Kd.integer[0];
+          rep_requete[2] = ROV.PID[4].Kd.integer[1];
+          rep_requete[3] = ROV.PID[4].Kd.integer[2];
+          rep_requete[4] = ROV.PID[4].Kd.integer[3];
+          error_can = CAN_send(rep_requete,0x51); //Send Kd value
+  }
+  
+  
+}
+
+
+//les fonctions suivantes sont des fonctions utilisées pour le débogage
+void USART_puts(USART_TypeDef* USARTx,__IO char *s)
+{
+
+	while(*s){
+		// wait until data register is empty
+		while( !(USARTx->SR & 0x00000040) ); 
+		USART_SendData(USARTx, *s);
+		*s++;
+	}
+}
+    
+//converting data from float to char
+char* conv_f2c(float f)
+{
+  
+    static int pint;
+    static int pfract;
+    static char string[7];
+    static int sign;
+    
+    sign=(int)f;
+    pint =(int)f;
+    pfract= (int)((f - pint)*1000);
+    pint = abs(pint);
+    pfract = abs(pfract);
+    
+    
+    
+     if (sign < 0)
+    {
+      sprintf(string,"-%03d.%03d",pint,pfract);
+    }  
+    else
+    {
+      sprintf(string,"%03d.%03d",pint,pfract);
+    }
+    return string;
+  
+}
