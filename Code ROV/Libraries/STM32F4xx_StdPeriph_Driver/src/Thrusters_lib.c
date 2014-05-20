@@ -33,7 +33,7 @@
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void THRUSTER_init(void)
+void THRUSTER_init(thruster*  propulsion)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -90,25 +90,33 @@ void THRUSTER_init(void)
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
   TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
   
-
+    propulsion[0].speed_command.integer16 = 0;
+    propulsion[1].speed_command.integer16 = 0;
+    propulsion[2].speed_command.integer16 = 0;
+    propulsion[3].speed_command.integer16 = 0;
+    propulsion[4].speed_command.integer16 = 0;
+    propulsion[5].speed_command.integer16 = 0;
+    THRUSTER_update(propulsion);
+  
+  
 }
 
 /*******************************************************************************
 * Function Name  : THRUSTER_update
 * Description    : Changing motors speed
+* Input          : A table of 
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void THRUSTER_update( __IO thruster* Propulsion)
+void THRUSTER_update(thruster* propulsion)
 {
  
   TIM_OCInitTypeDef  TIM_OCInitStructure;
-
   
   /* PWM1: TIM4 CH1 */
   TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = Propulsion[0].speed_command.integer16;
+  TIM_OCInitStructure.TIM_Pulse = propulsion[0].speed_command.integer16;
   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
   TIM_OC1Init(TIM4, &TIM_OCInitStructure);
@@ -117,7 +125,7 @@ void THRUSTER_update( __IO thruster* Propulsion)
 
   /* PWM2: TIM4 CH2 */
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = Propulsion[1].speed_command.integer16;
+  TIM_OCInitStructure.TIM_Pulse = propulsion[1].speed_command.integer16;
 
   TIM_OC2Init(TIM4, &TIM_OCInitStructure);
 
@@ -125,7 +133,7 @@ void THRUSTER_update( __IO thruster* Propulsion)
 
   /* PWM3: TIM4 CH3 */
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = Propulsion[2].speed_command.integer16;
+  TIM_OCInitStructure.TIM_Pulse = propulsion[2].speed_command.integer16;
 
   TIM_OC3Init(TIM4, &TIM_OCInitStructure);
 
@@ -133,7 +141,7 @@ void THRUSTER_update( __IO thruster* Propulsion)
 
   /* PWM4: TIM4 CH4 */
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = Propulsion[3].speed_command.integer16;
+  TIM_OCInitStructure.TIM_Pulse = propulsion[3].speed_command.integer16;
 
   TIM_OC4Init(TIM4, &TIM_OCInitStructure);
 
@@ -141,7 +149,7 @@ void THRUSTER_update( __IO thruster* Propulsion)
   
   /* PWM5: TIM3 CH1*/
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = Propulsion[4].speed_command.integer16;
+  TIM_OCInitStructure.TIM_Pulse = propulsion[4].speed_command.integer16;
 
   TIM_OC1Init(TIM3, &TIM_OCInitStructure);
   
@@ -149,7 +157,7 @@ void THRUSTER_update( __IO thruster* Propulsion)
   
   /* PWM6: TIM3 CH6*/
   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = Propulsion[5].speed_command.integer16;
+  TIM_OCInitStructure.TIM_Pulse = propulsion[5].speed_command.integer16;
 
   TIM_OC2Init(TIM3, &TIM_OCInitStructure);
   
@@ -164,3 +172,5 @@ void THRUSTER_update( __IO thruster* Propulsion)
   TIM_Cmd(TIM3, ENABLE);
   TIM_Cmd(TIM4, ENABLE);
   }
+
+/* End of file ---------------------------------------------------------------*/

@@ -32,7 +32,7 @@ void TIM_Init() {
   
   /* Enable the TIM10 gloabal Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_TIM10_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 4;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   
@@ -75,7 +75,7 @@ void TIM_Init() {
 
   /* Enable the TIM11 gloabal Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = TIM1_TRG_COM_TIM11_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
@@ -119,7 +119,7 @@ void TIM_Init() {
 
   /* Enable the TIM13 gloabal Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = TIM8_UP_TIM13_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
@@ -163,7 +163,7 @@ void TIM_Init() {
 
   /* Enable the TIM14 gloabal Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = TIM8_TRG_COM_TIM14_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
@@ -198,3 +198,5 @@ void TIM_Init() {
   /* TIM14 enable counter */
   TIM_Cmd(TIM14, ENABLE);
 }
+
+/* End of file ---------------------------------------------------------------*/

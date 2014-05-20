@@ -75,3 +75,5 @@ void pid_set(pid_controller* pid, float p, float i, float d)
   pid->Ki.floating_number = i;
   pid->Kd.floating_number = d;
 }
+
+/* End of file ---------------------------------------------------------------*/

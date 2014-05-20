@@ -6,7 +6,7 @@
 * Description        : This file contains all the functions prototypes for thrusters control library
 ****************************************************************************/
 
-// Propulsion system data strusture 
+// propulsion system data strusture 
 typedef union _Data2
 {
   uint16_t integer16;
@@ -16,13 +16,13 @@ typedef union _Data2
 typedef struct 
 {
   uint16_t status;
-  union_thruster speed_command;
+  union_thruster volatile speed_command;
   union_thruster speed_feedback;
   uint8_t efficiency;
   
 }thruster;
 
 /* Exported functions --------------------------------------------------------*/
-void THRUSTER_update(__IO thruster *Propulsion);
-void THRUSTER_init(void);
+void THRUSTER_update(thruster *propulsion);
+void THRUSTER_init(thruster *propulsion);
 

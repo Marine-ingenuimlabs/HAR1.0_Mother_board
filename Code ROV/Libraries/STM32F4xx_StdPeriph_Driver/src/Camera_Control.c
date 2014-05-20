@@ -43,7 +43,7 @@ Command 1&2 are composed of 7 bits each one, which refers to:
  -----------------------------------------------------------------------------------
 There is some extra codes that can be usefull in our application as:
  ---------------------------------------------------
-|                 |Byte 3 |Byte 4|Byte 5|Byte 6     |        
+|                 |Byte 3 |Byte 4|Byte 5|Byte 6     |
  ---------------------------------------------------
 |  Go to Preset   |  00   |  07  |  00  | 01 to FF  |
  ---------------------------------------------------
@@ -62,22 +62,21 @@ There is some extra codes that can be usefull in our application as:
 
 
 /* Private typedef -----------------------------------------------------------*/
-
 /* Private define ------------------------------------------------------------*/
 #define SYNC 0XFF
 #define CAMERA_ADR 0X01
-/* Private macro -------------------------------------------------------------*/
 
+/* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t rString = 0x00;
 uint8_t PelcoD_Counter;
 uint8_t Cmd1, Cmd2;
 uint8_t checksum;
 
-/* Global variables ---------------------------------------------------------*/
 
-
+/* Global variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
+
 /*******************************************************************************
 * Function Name  : PelcoD_Send
 * Description    : Sending all the commands to control the cam in PelcoD
@@ -89,8 +88,6 @@ uint8_t checksum;
 void PelcoD_Send(PelcoD_Message* PelcoD){
   
     PelcoD_Counter=0;
-    
-    
     
     RS485Cmd(false,true); 
     Cmd1 = 0;
@@ -132,11 +129,11 @@ void SendMode(bool bSend)
   if(bSend)
   {
     GPIO_SetBits(GPIOC, GPIO_Pin_8);
-  }
+  }/*if we want sending mode */
   else
   {
     GPIO_ResetBits(GPIOC, GPIO_Pin_8);  
-  }
+  }/*if we want receiving mode*/
 }
 
 /*******************************************************************************
@@ -184,14 +181,14 @@ void RS485_init()
  
   /* USART2 configuration ------------------------------------------------------*/
   /* USART2 configured as follow:
-        - BaudRate = 57600 baud
+        - BaudRate = 9600 baud
         - Word Length = 8 Bits
         - One Stop Bit
         - No parity
         - Hardware flow control disabled (RTS and CTS signals)
         - Receive and transmit enabled
   */
-  USART_InitStructure.USART_BaudRate = 57600;
+  USART_InitStructure.USART_BaudRate = 9600; //PelcoD baudrate
   USART_InitStructure.USART_WordLength = USART_WordLength_8b;
   USART_InitStructure.USART_StopBits = USART_StopBits_1;
   USART_InitStructure.USART_Parity = USART_Parity_No;
@@ -209,7 +206,7 @@ void RS485_init()
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   
-  /* Enable the USART Transmoit interrupt: this interrupt is generated when the 
+  /* Enable the USART Transmit interrupt: this interrupt is generated when the 
    USART1 transmit data register is empty */  
    //USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
 
@@ -245,7 +242,7 @@ void RS485Cmd(bool bRxEnable, bool bTxEnable)
     USART_Cmd(USART2, ENABLE);
     USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
     USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-  }
+  }/*if reception enabled*/
   else if(bTxEnable)
   {
     SendMode(true); 
@@ -255,12 +252,12 @@ void RS485Cmd(bool bRxEnable, bool bTxEnable)
     /* USART2 transmit data register is empty */  
     USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
     USART_ITConfig(USART2, USART_IT_RXNE, DISABLE);
-  }
+  }/*if sending is enabled*/
   else
   {
     SendMode(false); 
     USART_Cmd(USART2, DISABLE);
-  }
+  }/*if error*/
 }
 
 /*******************************************************************************

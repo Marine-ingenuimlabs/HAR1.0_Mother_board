@@ -22,9 +22,11 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdio.h>
-
+#include "arm_math.h"
 #include "communication_lib.h"
 #include <stm32f4xx_usart.h> 
+
+
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
   * @{
   */
@@ -39,12 +41,27 @@
 /* Private variables ---------------------------------------------------------*/
 
 ROV_Struct ROV ;
+union_float ff;
+CanRxMsg CANMSG;
+CanTxMsg CanTx;
+int tt = 0;
 
-uint8_t exampl[5];
-uint8_t exampl1[4];
+/*
+float32_t b = 35; //thruster angle
+float32_t d = 342.64; //in millimeters
+float32_t gamma = 175; //in millimeters
+float32_t val1,val2,val3,val4,val5;
+float32_t thruster_matrix_vector[36];
+arm_matrix_instance_f32 thruster_matrix; 
+arm_matrix_instance_f32 force_moment_matrix;
+float32_t force_moment_vector[] = { 1 , 0 , 0 , 0 , 0 , 0};
+*/
+
+//__IO uint8_t UserButtonPressed = 0x00;
+
 
 /* Private function prototypes -----------------------------------------------*/
-//void Delay(__IO uint32_t nCount);
+
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -122,7 +139,7 @@ void init_USART1(uint32_t baudrate){
 	USART_Cmd(USART1, ENABLE);
 }
 
-//write char via usart1 debug serial
+
 
 
 
@@ -133,36 +150,115 @@ void init_USART1(uint32_t baudrate){
   */
 int main(void)
 {
- //SysTick_Config(SystemCoreClock / 10000);
- //ROV_Init(&ROV);
- init_USART1(9600);
-      TIM_Init();
-    CAN_init();
-    ROV_VAR_Init(&ROV);
- ROV.Motion.Roll.floating_number = 1.1;
- ROV.Motion.Pitch.floating_number = 9.6;
- ROV.Motion.Yaw.floating_number = 7.1;
- ROV.CAN_Tab[31].State = 0;
- ROV.State=0x01;
+  
+  NVIC_SetPriority(SysTick_IRQn, 0x5); //configure systick priority
+  
+  /*
+  val1 = (1/(4*cos(b)));
+  val2 = (1/(4*sin(b)));
+  val3 = 0.5;
+  val4 = (1/(2*gamma));
+  val5 = (1/(2*d*cos(b)));
+  thruster_matrix_vector[0] = val1;
+  thruster_matrix_vector[1] = val2;
+  thruster_matrix_vector[2] = 0;
+  thruster_matrix_vector[3] = 0;
+  thruster_matrix_vector[4] = 0;
+  thruster_matrix_vector[5] = val5;
+  thruster_matrix_vector[6] = val1;
+  thruster_matrix_vector[7] = -val2;
+  thruster_matrix_vector[8] = 0;
+  thruster_matrix_vector[9] = 0;
+  thruster_matrix_vector[10] = 0;
+  thruster_matrix_vector[11] = -val5;
+  thruster_matrix_vector[12] = val1;
+  thruster_matrix_vector[13] = val2;
+  thruster_matrix_vector[14] = 0;
+  thruster_matrix_vector[15] = 0;
+  thruster_matrix_vector[16] = 0;
+  thruster_matrix_vector[17] = -val5;
+  thruster_matrix_vector[18] = val1;
+  thruster_matrix_vector[19] = -val2;
+  thruster_matrix_vector[20] = 0;
+  thruster_matrix_vector[21] = 0;
+  thruster_matrix_vector[22] = 0;
+  thruster_matrix_vector[23] = val5;
+  thruster_matrix_vector[24] = 0;
+  thruster_matrix_vector[25] = 0;
+  thruster_matrix_vector[26] = val3;
+  thruster_matrix_vector[27] = val4;
+  thruster_matrix_vector[28] = 0;
+  thruster_matrix_vector[29] = 0;
+  thruster_matrix_vector[30] = 0;
+  thruster_matrix_vector[31] = 0;
+  thruster_matrix_vector[32] = val3;
+  thruster_matrix_vector[33] = val4;
+  thruster_matrix_vector[34] = 0;
+  thruster_matrix_vector[35] = 0;
+    
+  arm_mat_init_f32(&thruster_matrix, 6, 6,thruster_matrix_vector);
+  arm_mat_init_f32(&thruster_matrix, 6, 6,thruster_matrix_vector);
+  b = thruster_matrix.pData[26];
+ */
  
-     
-     exampl[0] = 0x31;
-     exampl[1] = 0x01;
-     
-     
-     
-      //(*bbb) = (*aaa);
-      
-      //(*aaa) = ((*aaa)>>8);
-    CAN_send(exampl,0x09);
-        
-//USART_puts(USART1, "Init complete! Hello World!\r\n"); 
-  while (1)
-  { 
+  ROV_Init(&ROV);
+  FuncCallbackTable_INIT(); //initialization of functions pointers table
+  
+  SysTick_Config(SystemCoreClock / 10000);
+ 
+   ROV.propulsion[0].speed_command.integer16 = 0;
+   ROV.propulsion[1].speed_command.integer16 = 0;
+   ROV.propulsion[2].speed_command.integer16 = 0;
+   ROV.propulsion[3].speed_command.integer16 = 0;
+   THRUSTER_update(ROV.propulsion);
+
+    ROV.rov_state.is_streaming_enabled = 0;
+
     
+
+ ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number = 5.3;
+ ROV.measurement_unit_sensors.AHRS.Euler_Angle.y_value.floating_number = 9.6;
+ ROV.measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number = 7.1;
+ ROV.identifiers_table[80].State = 1;
+ ROV.identifiers_table[81].State = 0;
+ ROV.identifiers_table[82].State = 0;
+ 
+
+  ROV.light.right.integer16 = 1500;
+  
+  /* Initialize LEDs and User_Button on STM32F4-Discovery --------------------*/
+  //STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI); 
+
+  
+   while (1)
+   { 
+ /*   if (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
+  {
+     UserButtonPressed=0;
+      // Waiting User Button is released 
+      while (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
+      {} 
+        CanTx.DLC = 4;
+  CanTx.Data[0] = 0x9A ;
+  CanTx.Data[1] = 0x99 ;
+  CanTx.Data[2] = 0xA9 ;
+  CanTx.Data[3] = 0x40;
+  //CanTx.Data[4] = 0x40;
+
+  CanTx.IDE = CAN_Id_Extended;
+  CanTx.ExtId = 0x50;
+  CAN_Transmit(CAN1, &CanTx);
+     
+    }
+     */
+   //ROV.propulsion[0].speed_command.integer16 = 0;
+   //ROV.propulsion[1].speed_command.integer16 = 0;
+   //THRUSTER_update(ROV.propulsion);
+    // ROV_Stream_VAR(ROV);
     
-    
+    // Delay(0x1FFFFFF);
   }
+  
 }
 
 /**
@@ -170,6 +266,7 @@ int main(void)
   * @param  None
   * @retval None
   */
+
 
 
 #ifdef  USE_FULL_ASSERT
@@ -181,7 +278,7 @@ int main(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line)
+void assert_failed(uint8_t *file, uint32_t line)
 {
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
@@ -200,8 +297,6 @@ void assert_failed(uint8_t* file, uint32_t line)
 /**
   * @}
   */ 
-
-//init for usart1 debug serial
 
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

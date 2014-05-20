@@ -10,6 +10,10 @@
 #include "stm32f4xx_can.h"
 /* Private typedef -----------------------------------------------------------*/
 typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
+
+
+
+
  
 /* Private define ------------------------------------------------------------*/
   #define GPIO_CAN                   GPIOD
@@ -103,7 +107,7 @@ each amont of data have its unique ID with an extended ID used to specifie eithe
 // Depth data ID  
   #define CAN_PRESSURE_ID
 
-// Propulsion system 
+// propulsion system 
   #define CAN_FRTHRUSTERS_ID // Data of the front right thruster 
   #define CAN_FLTHRUSTERS_ID // Data of the front left thruster
   #define CAN_RRTHRUSTERS_ID // Data of the rear right thruster 
@@ -126,8 +130,10 @@ each amont of data have its unique ID with an extended ID used to specifie eithe
 
 
 
-// CAMERA data ID
 
+
+// CAMERA data ID
+/*
   #define CANx                       CAN1
   #define CAN_CLK                    RCC_APB1Periph_CAN1
   #define CAN_RX_PIN                 GPIO_Pin_0
@@ -138,7 +144,7 @@ each amont of data have its unique ID with an extended ID used to specifie eithe
   #define CAN_RX_SOURCE              GPIO_PinSource0
   #define CAN_TX_SOURCE              GPIO_PinSource1 
 
-
+*/
 
 // CAN BAUD RATE SELECTION
 #define   _125KB
@@ -155,4 +161,7 @@ void CAN_init(void);
 void CAN_MessageTransmit (void);
 
 /* Send message via CAN ----------------------------------------------------- */
-uint8_t CAN_send(uint8_t *message, uint8_t messageid);
+uint8_t CAN_send(uint8_t volatile *message, uint8_t messageid);
+
+
+/* End of file ---------------------------------------------------------------*/

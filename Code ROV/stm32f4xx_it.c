@@ -38,23 +38,20 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Extern variables ---------------------------------------------------------*/
-extern void volatile (*ptr[16])(ROV_Struct*,CanRxMsg); // Functions Callback Table
+extern void volatile (*function_pointer[16])(ROV_Struct*,CanRxMsg); // Functions Callback Table
 extern ROV_Struct ROV;
+extern __IO uint8_t UserButtonPressed;
 /* Private variables ---------------------------------------------------------*/
-uint8_t sle7 = 0;
 uint16_t capture = 0;
-union_float f;
-char* s;
-
+union_float s;
+CanRxMsg Rx;
+CanTxMsg CTx;
+uint8_t sle7 = 0;
+union_thruster entier16;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+char *str;
 //delay function
-void Delay(__IO uint32_t nCount)
-{
-  while(nCount--)
-  {
-  }
-}
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */
 /******************************************************************************/
@@ -149,45 +146,63 @@ void PendSV_Handler(void)
 
 void SysTick_Handler(void)
 {
+  /*
+  Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz);
+  Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz);
   
-   
-
+  THRUSTER_update(ROV.propulsion);
+  sle7++;
+  
+ */
+  ROV.propulsion[0].speed_command.integer16 = (19999);
+  ROV.propulsion[1].speed_command.integer16 = (19999);
+  ROV.propulsion[2].speed_command.integer16 = (19999);
+  ROV.propulsion[3].speed_command.integer16 = (19999);
+  //function_pointer[Rx.StdId](&ROV,Rx);
+  
 }
 void UART4_IRQHandler(void)
 {
-	if(USART_GetITStatus(UART4, USART_IT_RXNE) == SET)
-	{
-           if((ROV.State&&0x02) == 0x02) //Check if Communication With AIOP is enabled
-           {
-            AIOP_ReceiveChar((USART_ReceiveData(UART4) & 0xFF),(&(ROV.AIO)));   
-            USART_ClearITPendingBit(UART4, USART_IT_RXNE);
-           }
-	}
+  if(USART_GetITStatus(UART4, USART_IT_RXNE) == SET)
+  {
+    if(ROV.rov_state.is_aiop_communication_allowed == 1)
+    {
+      
+    AIOP_ReceiveChar((USART_ReceiveData(UART4) & 0xFF),(&(ROV.aio)));   
+    USART_ClearITPendingBit(UART4, USART_IT_RXNE);
+    
+    }/* if communication with AIOP is enabled */
+  }/* if USART4 interrupt has occurred */
 }
 
 void USART2_IRQHandler(void)
 {
-	if(USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
-	{
-           /*get the caracter readed  from the RS485 bus*/
-          USART_ReceiveData(USART2) ; //
-          USART_ClearITPendingBit(USART2, USART_IT_RXNE);  
-	}
-        if(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == SET)
-        {
-         // RS485_Send();
-          USART_ClearITPendingBit(USART2, USART_FLAG_TXE); 
-        }
+  if(USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
+  {
+     /*get the caracter readed  from the RS485 bus*/
+    USART_ReceiveData(USART2) ; //
+    USART_ClearITPendingBit(USART2, USART_IT_RXNE);  
+  }
+  if(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == SET)
+  {
+   // RS485_Send();
+    USART_ClearITPendingBit(USART2, USART_FLAG_TXE); 
+  }
 }
 void TIM1_UP_TIM10_IRQHandler(void)
 {
 
   if (TIM_GetITStatus(TIM10, TIM_IT_CC1) != RESET)
-  {     if(((ROV.State)&&0x01) == 0x01) //check if streaming is allowed
-  {
-         ROV_Stream_VAR(ROV);
-  }
-        
+  {if(((ROV.rov_state.is_streaming_enabled) == 1)&&(ROV.rov_state.is_variable_in_use == 1 ))
+    {
+      
+      
+        ROV_Stream_VAR(ROV);
+    }
+    /*if streaming is enabled */
+    
+    Lighting_update(&ROV.light);
+    
     TIM_ClearITPendingBit(TIM10, TIM_IT_CC1);
     capture = TIM_GetCapture1(TIM10);
     TIM_SetCompare1(TIM10, capture + 1000);
@@ -197,8 +212,10 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void) //at a frequency of 50hz
 {   
   if (TIM_GetITStatus(TIM11, TIM_IT_CC1) != RESET)
   {
-    
+/* here goes the place of the control algorithm */
 
+    THRUSTER_update(ROV.propulsion);
+      
     TIM_ClearITPendingBit(TIM11, TIM_IT_CC1);
     capture = TIM_GetCapture1(TIM11);
     TIM_SetCompare1(TIM11, capture + 200);
@@ -207,10 +224,8 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void) //at a frequency of 50hz
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   
-  
   if (TIM_GetITStatus(TIM13, TIM_IT_CC1) != RESET)
   {
-    
     TIM_ClearITPendingBit(TIM13, TIM_IT_CC1);
     capture = TIM_GetCapture1(TIM13);
     TIM_SetCompare1(TIM13, capture + 100);
@@ -240,108 +255,112 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 *******************************************************************************/
 
 void CAN1_RX0_IRQHandler(void)
-{  //CanTxMsg TxMessage;
-   CanRxMsg RxMessage;
+{ 
+  
+   
    
    if(CAN_GetITStatus(CAN1, CAN_IT_FMP0)!= RESET){ // A message is pending in the FIFO 0
  
-   CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
-   if(sle7==0)
-   {
-   Toggle_Var_Stream_State(&ROV,RxMessage);
-   sle7 = 1;
+   CAN_Receive(CAN1, CAN_FIFO0, &Rx);
+   
+   ROV.propulsion[0].speed_command.integer16 = 0;
+   ROV.propulsion[1].speed_command.integer16 = 0;
+   ROV.propulsion[2].speed_command.integer16 = 0;
+   ROV.propulsion[3].speed_command.integer16 = 0;
+   
+   
+   /*if(sle7<1){
+     function_pointer[Rx.StdId](&ROV,Rx);
+     sle7++;
    }
    
-   /*TxMessage.StdId   = 0x7eF;
-   TxMessage.ExtId   = 0x01;
-   TxMessage.RTR     = CAN_RTR_DATA;
-   TxMessage.IDE     = CAN_ID_STD;
-   TxMessage.DLC     = 3;
-   TxMessage.Data[0] = (RxMessage.StdId >> 8) & 0xFF;
-   TxMessage.Data[1] =  RxMessage.StdId       & 0xFF;
-   TxMessage.Data[2] =  RxMessage.DLC;
-
-   CAN_Transmit(CAN1, &TxMessage);*/
+   s[0] = Rx.Data[0];
+   s[1] = Rx.Data[1];
+   s[2] = Rx.Data[2];
+   s[3] = Rx.Data[3];
+      */
+   //ROV_Toggle_AIOP_Communication(&ROV,RxMessage);
    
+   
+   if(Rx.RTR == CAN_RTR_Data)
+   {
+     
+     function_pointer[Rx.StdId](&ROV,Rx);
+    
+   }
+   else
+   {
+     ROV_Req_Val(&ROV,Rx);
+   }
+   
+     
    //-------- THIS IS JUST FOR DEBUG -----------------------------------//
-     f.integer[0] = ROV.Motion.Roll.integer[0];
-     f.integer[1] = ROV.Motion.Roll.integer[1];
-     f.integer[2] = ROV.Motion.Roll.integer[2];
-     f.integer[3] = ROV.Motion.Roll.integer[3];
-     s = conv_f2c(f.floating_number);
-     USART_puts(USART1, s);
-     Delay(0xFFFFF);
-    USART_puts(USART1, "\n");
-    Delay(0xFFFFF);
+     //f.integer[0] = ROV.Motion.Roll.integer[0];
+     //f.integer[1] = ROV.Motion.Roll.integer[1];
+     //f.integer[2] = ROV.Motion.Roll.integer[2];
+     //f.integer[3] = ROV.Motion.Roll.integer[3];
+     //s = conv_f2c(f.floating_number);
+     //USART_puts(USART1, s);
+     //Delay(0xFFFFF);
+    //USART_puts(USART1,ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.integer);
+    //Delay(0xFFFFF);
+  //  if(Rx.DLC<30){
+    // sprintf(str,"%d",Rx.Data);
+   //}
+  // else if(Rx.DLC<70){
+     //sprintf(str,"%d",Rx.Data);
+   //}
+   //else{
+ /*  s.integer[0] = Rx.Data[0];
+   s.integer[1] = Rx.Data[1];
+   s.integer[2] = Rx.Data[2];
+   s.integer[3] = Rx.Data[3];
+   str = conv_f2c(s.floating_number);
+   //}
+ USART_puts(USART1,str);
+ USART_puts(USART1,"\n");
+ */
+   /*
+ if((Rx.DLC%2)==0)
+ {
+   for(int x=0;x<(Rx.DLC);x=x+2)
+   {
+   entier16.integer8[0] = Rx.Data[x];
+   entier16.integer8[1] = Rx.Data[x+1];
+   USART_SendData(USART1,entier16.integer16);
+   }}
+   else
+   {
+   for(int x=0;x<(Rx.DLC-1);x=x+2)
+   {
+   entier16.integer8[0] = Rx.Data[x];
+   entier16.integer8[1] = Rx.Data[x+1];
+   USART_SendData(USART1,entier16.integer16);
+   }
+   entier16.integer8[0] = Rx.Data[Rx.DLC-1];
+   entier16.integer8[1] = 0x00;
+   USART_SendData(USART1,entier16.integer16);
+   }*/
+ /*
+   GPIO_ToggleBits(GPIOD,12);
+     
+     char strx[20];
+ // USART_puts( USART1, "JOYSTICK: ");
+     for(int i=0;i<8;i++)
+     {
+   sprintf(strx,"%d  ",Rx.Data[i]);
+    USART_puts( USART1, strx);
+//   USART_puts( USART1,  " ");
+     }
+     USART_puts( USART1,  "\n");*/
+ //  sprintf(strx,"X:%d Y:%d Rz:%d Slider:%d Pov:%d Buttons:%d %d %d %d %d %d \n",ROV_joy.X,ROV_joy.Y,ROV_joy.Rz,ROV_joy.slider, ROV_joy.pov,ROV_joy.button[0],ROV_joy.button[1],ROV_joy.button[2],ROV_joy.button[3],ROV_joy.button[4],ROV_joy.button[5]);
+
+   
     //-----------------------------------------------------------------//
    CAN_ClearITPendingBit(CAN1,CAN_IT_FMP0); }
 }
 
-/**
-  * @brief  This function handles TIM10 global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void TIM10_IRQHandler(void)
-{
-  if (TIM_GetITStatus(TIM10, TIM_IT_CC1) != RESET)
-  {
 
-    TIM_ClearITPendingBit(TIM10, TIM_IT_CC1);
-  }
-}
-
-/**
-  * @brief  This function handles TIM1 global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void TIM11_IRQHandler(void)
-{
- 
-
- 
-  
-  if (TIM_GetITStatus(TIM11, TIM_IT_CC1) != RESET)
-  {
-
-    TIM_ClearITPendingBit(TIM11, TIM_IT_CC1);
-
-
-  }
-}
-
-/**
-  * @brief  This function handles TIM10 global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void TIM13_IRQHandler(void)
-{
-  if (TIM_GetITStatus(TIM13, TIM_IT_CC1) != RESET)
-  {
-
-    TIM_ClearITPendingBit(TIM13, TIM_IT_CC1);
-
-
-  }
-}
-
-/**
-  * @brief  This function handles TIM10 global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void TIM14_IRQHandler(void)
-{
-  if (TIM_GetITStatus(TIM14, TIM_IT_CC1) != RESET)
-  {
-
-    TIM_ClearITPendingBit(TIM14, TIM_IT_CC1);
-
-
-  }
-}
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
@@ -365,6 +384,21 @@ void TIM14_IRQHandler(void)
 /**
   * @}
   */ 
+/*
+void EXTI0_IRQHandler(void)
+{
+  UserButtonPressed = 0x01;
+  CTx.DLC = 4;
+  CTx.Data[0] = 0x9A ;
+  CTx.Data[1] = 0x99 ;
+  CTx.Data[2] = 0xA9 ;
+  CTx.Data[3] = 0x40;
+  //CanTx.Data[4] = 0x40;
 
-
+  CTx.IDE = CAN_Id_Extended;
+  CTx.ExtId = 0x50;*/
+  //CAN_Transmit(CAN1, &CTx);
+  /* Clear the EXTI line pending bit */
+  /*EXTI_ClearITPendingBit(USER_BUTTON_EXTI_LINE);
+}*/
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

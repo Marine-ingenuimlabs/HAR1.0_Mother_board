@@ -148,30 +148,30 @@ static __INLINE __ASM int32_t __REVSH(int32_t value)
 
     This function performs a exclusive LDR command for 8 bit value.
 
-    \param [in]    ptr  Pointer to data
-    \return             value of type uint8_t at (*ptr)
+    \param [in]    function_pointer  Pointer to data
+    \return             value of type uint8_t at (*function_pointer)
  */
-#define __LDREXB(ptr)                     ((uint8_t ) __ldrex(ptr))
+#define __LDREXB(function_pointer)                     ((uint8_t ) __ldrex(function_pointer))
 
 
 /** \brief  LDR Exclusive (16 bit)
 
     This function performs a exclusive LDR command for 16 bit values.
 
-    \param [in]    ptr  Pointer to data
-    \return        value of type uint16_t at (*ptr)
+    \param [in]    function_pointer  Pointer to data
+    \return        value of type uint16_t at (*function_pointer)
  */
-#define __LDREXH(ptr)                     ((uint16_t) __ldrex(ptr))
+#define __LDREXH(function_pointer)                     ((uint16_t) __ldrex(function_pointer))
 
 
 /** \brief  LDR Exclusive (32 bit)
 
     This function performs a exclusive LDR command for 32 bit values.
 
-    \param [in]    ptr  Pointer to data
-    \return        value of type uint32_t at (*ptr)
+    \param [in]    function_pointer  Pointer to data
+    \return        value of type uint32_t at (*function_pointer)
  */
-#define __LDREXW(ptr)                     ((uint32_t ) __ldrex(ptr))
+#define __LDREXW(function_pointer)                     ((uint32_t ) __ldrex(function_pointer))
 
 
 /** \brief  STR Exclusive (8 bit)
@@ -179,11 +179,11 @@ static __INLINE __ASM int32_t __REVSH(int32_t value)
     This function performs a exclusive STR command for 8 bit values.
 
     \param [in]  value  Value to store
-    \param [in]    ptr  Pointer to location
+    \param [in]    function_pointer  Pointer to location
     \return          0  Function succeeded
     \return          1  Function failed
  */
-#define __STREXB(value, ptr)              __strex(value, ptr)
+#define __STREXB(value, function_pointer)              __strex(value, function_pointer)
 
 
 /** \brief  STR Exclusive (16 bit)
@@ -191,11 +191,11 @@ static __INLINE __ASM int32_t __REVSH(int32_t value)
     This function performs a exclusive STR command for 16 bit values.
 
     \param [in]  value  Value to store
-    \param [in]    ptr  Pointer to location
+    \param [in]    function_pointer  Pointer to location
     \return          0  Function succeeded
     \return          1  Function failed
  */
-#define __STREXH(value, ptr)              __strex(value, ptr)
+#define __STREXH(value, function_pointer)              __strex(value, function_pointer)
 
 
 /** \brief  STR Exclusive (32 bit)
@@ -203,11 +203,11 @@ static __INLINE __ASM int32_t __REVSH(int32_t value)
     This function performs a exclusive STR command for 32 bit values.
 
     \param [in]  value  Value to store
-    \param [in]    ptr  Pointer to location
+    \param [in]    function_pointer  Pointer to location
     \return          0  Function succeeded
     \return          1  Function failed
  */
-#define __STREXW(value, ptr)              __strex(value, ptr)
+#define __STREXW(value, function_pointer)              __strex(value, function_pointer)
 
 
 /** \brief  Remove the exclusive lock
@@ -408,8 +408,8 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __RBIT(uint32_t valu
 
     This function performs a exclusive LDR command for 8 bit value.
 
-    \param [in]    ptr  Pointer to data
-    \return             value of type uint8_t at (*ptr)
+    \param [in]    function_pointer  Pointer to data
+    \return             value of type uint8_t at (*function_pointer)
  */
 __attribute__( ( always_inline ) ) static __INLINE uint8_t __LDREXB(volatile uint8_t *addr)
 {
@@ -424,8 +424,8 @@ __attribute__( ( always_inline ) ) static __INLINE uint8_t __LDREXB(volatile uin
 
     This function performs a exclusive LDR command for 16 bit values.
 
-    \param [in]    ptr  Pointer to data
-    \return        value of type uint16_t at (*ptr)
+    \param [in]    function_pointer  Pointer to data
+    \return        value of type uint16_t at (*function_pointer)
  */
 __attribute__( ( always_inline ) ) static __INLINE uint16_t __LDREXH(volatile uint16_t *addr)
 {
@@ -440,8 +440,8 @@ __attribute__( ( always_inline ) ) static __INLINE uint16_t __LDREXH(volatile ui
 
     This function performs a exclusive LDR command for 32 bit values.
 
-    \param [in]    ptr  Pointer to data
-    \return        value of type uint32_t at (*ptr)
+    \param [in]    function_pointer  Pointer to data
+    \return        value of type uint32_t at (*function_pointer)
  */
 __attribute__( ( always_inline ) ) static __INLINE uint32_t __LDREXW(volatile uint32_t *addr)
 {
@@ -457,7 +457,7 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __LDREXW(volatile ui
     This function performs a exclusive STR command for 8 bit values.
 
     \param [in]  value  Value to store
-    \param [in]    ptr  Pointer to location
+    \param [in]    function_pointer  Pointer to location
     \return          0  Function succeeded
     \return          1  Function failed
  */
@@ -475,7 +475,7 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __STREXB(uint8_t val
     This function performs a exclusive STR command for 16 bit values.
 
     \param [in]  value  Value to store
-    \param [in]    ptr  Pointer to location
+    \param [in]    function_pointer  Pointer to location
     \return          0  Function succeeded
     \return          1  Function failed
  */
@@ -493,7 +493,7 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __STREXH(uint16_t va
     This function performs a exclusive STR command for 32 bit values.
 
     \param [in]  value  Value to store
-    \param [in]    ptr  Pointer to location
+    \param [in]    function_pointer  Pointer to location
     \return          0  Function succeeded
     \return          1  Function failed
  */

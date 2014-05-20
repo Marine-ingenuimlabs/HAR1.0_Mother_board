@@ -108,3 +108,5 @@ void Lighting_update(light_led* light)
  
   TIM_Cmd(TIM3, ENABLE);
   }
+
+/* End of file ---------------------------------------------------------------*/

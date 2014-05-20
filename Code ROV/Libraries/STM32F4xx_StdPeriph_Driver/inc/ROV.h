@@ -12,7 +12,7 @@
 #include "Lighting_lib.h"
 #include "Analog_sensors_lib.h"
 #include "CAN_Lib.h"
-#include "AIOPV1.h"
+#include "measurment_unit.h"
 #include "Camera_Control.h"
 #include "Timing_lib.h"
 #include "pid_lib.h"
@@ -23,6 +23,15 @@
 
 
 /* Private typedef -----------------------------------------------------------*/
+
+typedef struct
+{
+  uint8_t is_variable_in_use : 1;
+  uint8_t is_aiop_communication_allowed : 1;
+  uint8_t is_streaming_enabled : 1;
+  uint8_t is_computer_connected : 1;
+}state_of_rov;
+
 typedef union _5Data
 {
   float floating_number;
@@ -36,58 +45,41 @@ typedef union _Data4
 }union_16to8;
 
 
-//sensor structure
-typedef struct
-{
-  uint8_t Status;
-  uint8_t filter;
-}Sensor;
 
-
-typedef struct
-{
-  uint8_t* StrPtr;
-  uint8_t State;
-}Stream;
 
 
 // 3D sensor structure
 typedef struct 
 {
-  Sensor inertial;
-  float value[3];
-  float offesets[3];
-  uint8_t trust; 
+  union_float x_value,y_value,z_value;
+  union_float x_offset,y_offset,z_offset;
+}Sensor_3D_with_offset;
   
-}Sensor_3D;
+  typedef struct 
+{
+  union_float x_value,y_value,z_value;
+}Sensor_3D_with_no_offset;
 
 // IMU structure
 typedef struct 
 {
-  Sensor_3D Accel;
-  Sensor_3D Gyro;
-  Sensor_3D Mag;
-  
+  Sensor_3D_with_no_offset Accel;
+  Sensor_3D_with_no_offset Gyro;
+  Sensor_3D_with_offset Mag;
+  Sensor_3D_with_no_offset Euler_Angle;
 }IMU;
 
-// analog sensor structure
-typedef struct 
-{ Sensor analog;
-  float value;
-}Sensor_analog;
+
 
 //sensors structure
 typedef struct  
 {
-  Sensor_analog Current; 
-  Sensor_analog Voltage;
-  Sensor_analog Onboard_Temprature;
-  Sensor_analog Water_Temprature;
-  Sensor_analog Pressure;
+  union_float Current; 
+  union_float Voltage;
+  union_float Onboard_Temprature;
+  union_float Water_Temprature;
+  union_float Pressure;
   IMU AHRS;
-  uint8_t TrameReady;
-  uint8_t EndofTrame;
-  
 }Sensors;
 
 typedef struct 
@@ -100,26 +92,8 @@ typedef struct
   union_float Sway;
   // Z rotation and translation      
   union_float Yaw;
-  union_float Heave;
-  
+  union_float Heave; 
 }DOF;
-
-
-typedef struct //this structure will hold all the motion variables( accelerometer, gyroscope, and depth ( from pressure sensor ) )
-{
-  union_float Depth;
-  union_float Accelx;
-  union_float Accely;
-  union_float Accelz;
-  union_float Gyrox;
-  union_float Gyroy;
-  union_float Gyroz;
-  union_float Pitch;
-  union_float Roll;
-  union_float Yaw;
-
-}MotionVar;
-
 
 
 /* universal communication structure */ 
@@ -128,58 +102,31 @@ typedef struct
   union_16to8 x_axis; //valeur axe des x
   union_16to8 y_axis; //valeur axe des y
   union_16to8 rz_rotation; //valeur de la rotation autour de Z
-  union_16to8 th_1; // valeur throttle 1
-  union_16to8 th_2; //valeur throttle 2
-  union_16to8 buttons; // value of the other buttons
-    
+  union_16to8 throttle_1; // valeur throttle 1
+  union_16to8 throttle_2; //valeur throttle 2
+  union_16to8 buttons; // value of the other buttons  
+  union_16to8 pov;
 }Joystick;
 
 typedef struct
 {
-  uint8_t Type;
-  uint8_t Status;
-  uint8_t State;// specify the state of the communication 
-  uint8_t Trame_length;
-    
-}Communication;
-//@ ref Communication state for UART connected to AIOP
-
-# define Message_Waitingfor_Header 0X01
-# define Message_waitingfor_ID 0X02
-# define Message_Waitingfor_Data 0X03
-# define Message_Ready_for_Checking 0x04
-
-//@ ref Communication message type for UART connected to AIOP
-
-#define MSG_50Hz         0x0A
-#define MSG_10Hz         0X0B
-
-//@ ref  message state  comming from AIOP
-#define VALID_DATA 0x00
-#define INVALID_DATA 0x01
-#define PROCESSING_DATA 0x02
+  uint8_t volatile *pointer;
+  uint8_t volatile State;
+}VariableID;
 
 //ROV main structure
 typedef struct 
 {
   light_led light;
+  measurment_unit volatile aio;
+  thruster propulsion[6];
+  Sensors measurement_unit_sensors;
+  PelcoD_Message pelcod;
+  pid_controller pid[6];
+  Joystick joyst;
+  VariableID volatile identifiers_table[256];
+  state_of_rov rov_state;
   
-  //DOF DOF_Input;
-  //DOF DOF_Last_Input;
-  //DOF DOF_Output;
-  //DOF DOF_Last_Output;
-  uint8_t volatile State; //1rst bit:Stream State - 2nd bit: AIOP State
-  MotionVar Motion;
-  AllInOne volatile AIO;
-  thruster Propulsion[6];
-  Communication CAN;
-  Communication RS485;
-  Sensors Measurement_Unit;
-  PelcoD_Message PelcoD;
-  pid_controller PID[6];
-  Joystick volatile joyst;
-  Stream volatile CAN_Tab[256];
- 
 }ROV_Struct;
 
 /* Initialising all the variables tables for stream and the functions callback table */
@@ -187,16 +134,21 @@ void ROV_VAR_Init(ROV_Struct* ROV);
 
 
 /* ROV Initialisation ------------------------------------------------------- */
-void ROV_Init(ROV_Struct* ROV,CanRxMsg RxMessage);  //Initializing the vehicule
-
+void ROV_Init(ROV_Struct* ROV);
 void ROV_Routine(ROV_Struct* ROV);
-
-void ROV_DataUpdate(ROV_Struct* ROV);
-
-
+void Sensor_DataUpdate_10Hz(Sensors *destination,AIOP_10HZMessage volatile *source,state_of_rov *state);
+void Sensor_DataUpdate_50Hz(Sensors *destination,AIOP_50HZMessage volatile *source,state_of_rov *state);
+void update_pelcod_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
+/*
+void update_thrusters_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
+void update_lighting_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
+void update_joystick_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
+*/
+void communication_init(ROV_Struct* ROV,CanRxMsg RxMessage);
 
 
 
 //Les fonctions suivantes sont utilisées pour le débogage
 char* conv_f2c(float f); // convert from float to char
 void USART_puts(USART_TypeDef* USARTx,__IO char *s); //print via serial port
+void Delay(__IO uint32_t nCount);
