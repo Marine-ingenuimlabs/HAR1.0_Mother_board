@@ -154,10 +154,12 @@ void SysTick_Handler(void)
   sle7++;
   
  */
+  /*
   ROV.propulsion[0].speed_command.integer16 = (19999);
   ROV.propulsion[1].speed_command.integer16 = (19999);
   ROV.propulsion[2].speed_command.integer16 = (19999);
   ROV.propulsion[3].speed_command.integer16 = (19999);
+  */
   //function_pointer[Rx.StdId](&ROV,Rx);
   
 }
@@ -193,11 +195,15 @@ void TIM1_UP_TIM10_IRQHandler(void)
 {
 
   if (TIM_GetITStatus(TIM10, TIM_IT_CC1) != RESET)
-  {if(((ROV.rov_state.is_streaming_enabled) == 1)&&(ROV.rov_state.is_variable_in_use == 1 ))
+  {
+    if(((ROV.rov_state.is_streaming_enabled) == 1))
     {
       
-      
+      //if(sle7<100)
+      //{
         ROV_Stream_VAR(ROV);
+        //sle7++;
+      //}
     }
     /*if streaming is enabled */
     
@@ -226,6 +232,7 @@ void TIM8_UP_TIM13_IRQHandler(void)
   
   if (TIM_GetITStatus(TIM13, TIM_IT_CC1) != RESET)
   {
+    
     TIM_ClearITPendingBit(TIM13, TIM_IT_CC1);
     capture = TIM_GetCapture1(TIM13);
     TIM_SetCompare1(TIM13, capture + 100);
@@ -263,11 +270,20 @@ void CAN1_RX0_IRQHandler(void)
  
    CAN_Receive(CAN1, CAN_FIFO0, &Rx);
    
-   ROV.propulsion[0].speed_command.integer16 = 0;
+   
+   if( ROV.propulsion[3].speed_command.integer16 == 0)
+   {
+     ROV.propulsion[3].speed_command.integer16 = 19999;
+   }
+   else
+   {
+     ROV.propulsion[3].speed_command.integer16 = 0;
+   }
+   /*ROV.propulsion[0].speed_command.integer16 = 0;
    ROV.propulsion[1].speed_command.integer16 = 0;
    ROV.propulsion[2].speed_command.integer16 = 0;
    ROV.propulsion[3].speed_command.integer16 = 0;
-   
+   */
    
    /*if(sle7<1){
      function_pointer[Rx.StdId](&ROV,Rx);

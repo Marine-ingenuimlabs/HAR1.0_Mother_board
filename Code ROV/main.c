@@ -41,9 +41,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 ROV_Struct ROV ;
-union_float ff;
-CanRxMsg CANMSG;
-CanTxMsg CanTx;
+//union_float ff;
+//CanRxMsg CANMSG;
+//CanTxMsg CanTx;
 int tt = 0;
 
 /*
@@ -213,7 +213,7 @@ int main(void)
    THRUSTER_update(ROV.propulsion);
 
     ROV.rov_state.is_streaming_enabled = 0;
-
+    ROV.rov_state.is_computer_connected = 0;
     
 
  ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number = 5.3;
@@ -232,6 +232,14 @@ int main(void)
   
    while (1)
    { 
+      ROV.propulsion[0].speed_command.integer16 = ROV.light.left.integer16; //ROV.joyst.x_axis.integer16;
+      ROV.propulsion[1].speed_command.integer16 = ROV.light.right.integer16; //ROV.joyst.y_axis.integer16;
+      //ROV.propulsion[2].speed_command.integer16 = ROV.joyst.throttle_1.integer16;
+      //ROV.propulsion[3].speed_command.integer16 = ROV.joyst.throttle_2.integer16;
+       
+       
+      
+     
  /*   if (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
   {
      UserButtonPressed=0;

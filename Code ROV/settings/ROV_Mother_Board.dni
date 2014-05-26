@@ -20,7 +20,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=8946741
+Checksum=-117243182
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -99,7 +99,8 @@ Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Libraries\STM32F4xx_StdPeriph_Driver\src\communication_lib.c}.107.1" 0 0 1 "" 0 "" 0
+Count=1
 [Aliases]
 Count=0
 SuppressDialog=0

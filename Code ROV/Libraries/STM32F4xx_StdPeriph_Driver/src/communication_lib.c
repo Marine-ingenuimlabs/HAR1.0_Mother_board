@@ -30,15 +30,15 @@ void (*function_pointer[16])(ROV_Struct*,CanRxMsg); // Functions Callback Table
 *******************************************************************************/
 void ROV_Set_Var(ROV_Struct* ROV,CanRxMsg CAN_Msg)
 {
-  if(ROV->rov_state.is_variable_in_use==0)
-  {
+  //if(ROV->rov_state.is_variable_in_use==0)
+  //{
     ROV->rov_state.is_variable_in_use = 1;
     for(uint8_t cnt=0;cnt<(CAN_Msg.DLC-1);cnt++)
     {
       ROV->identifiers_table[CAN_Msg.Data[0]].pointer[(CAN_Msg.DLC-2)-cnt] = CAN_Msg.Data[cnt+1];
     }
   ROV->rov_state.is_variable_in_use = 0;
-  }
+  //}
 }
 
 /*******************************************************************************
@@ -104,7 +104,7 @@ void ROV_Stream_VAR(ROV_Struct ROV)
 *******************************************************************************/
 void ROV_Toggle_Streaming_Mode(ROV_Struct* ROV,CanRxMsg CAN_Msg)
 {
-  (ROV->rov_state.is_streaming_enabled) = (CAN_Msg.Data[0]&0x01);
+(ROV->rov_state.is_streaming_enabled) = (CAN_Msg.Data[0]&0x01);
 }
 
 /*******************************************************************************

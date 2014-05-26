@@ -1,56 +1,70 @@
 ###############################################################################
 #
-# IAR ELF Linker V7.10.1.6676/W32 for ARM                 20/May/2014  09:50:20
+# IAR ELF Linker V7.10.1.6676/W32 for ARM                 26/May/2014  17:57:40
 # Copyright 2007-2014 IAR Systems AB.
 #
 #    Output file  =  
-#        C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Exe\cpp.out
+#        C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014 (working
+#        CAN up&down)\Debug\Exe\cpp.out
 #    Map file     =  
-#        C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\List\cpp.map
+#        C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014 (working
+#        CAN up&down)\Debug\List\cpp.map
 #    Command line =  
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\Camera_Control.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\CAN_Lib.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\communication_lib.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\Lighting_lib.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\main.o" "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV
-#        Project - Copie\Debug\Obj\measurment_unit.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\misc.o" "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV
-#        Project - Copie\Debug\Obj\pid_lib.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\ROV.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\startup_stm32f4xx.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\stm32f4_discovery.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\stm32f4xx_adc.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\stm32f4xx_can.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\stm32f4xx_crc.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\stm32f4xx_dma.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\stm32f4xx_exti.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\stm32f4xx_gpio.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\stm32f4xx_it.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\stm32f4xx_rcc.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\stm32f4xx_syscfg.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\stm32f4xx_tim.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\stm32f4xx_usart.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\system_stm32f4xx.o"
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Obj\Thrusters_lib.o" "C:\Users\TOUCHI\Desktop\PFE\STM
-#        Coding\ROV Project - Copie\Debug\Obj\Timing_lib.o" -o
-#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project -
-#        Copie\Debug\Exe\cpp.out" --redirect _Printf=_PrintfSmall --redirect
-#        _Scanf=_ScanfSmall --map "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV
-#        Project - Copie\Debug\List\cpp.map" --config "C:\Program Files
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\Camera_Control.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\CAN_Lib.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\communication_lib.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\Lighting_lib.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\main.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\measurment_unit.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\misc.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\pid_lib.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\ROV.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\startup_stm32f4xx.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4_discovery.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_adc.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_can.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_crc.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_dma.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_exti.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_gpio.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_it.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_rcc.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_syscfg.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_tim.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\stm32f4xx_usart.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\system_stm32f4xx.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\Thrusters_lib.o"
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Obj\Timing_lib.o" -o
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\Exe\cpp.out" --redirect
+#        _Printf=_PrintfSmall --redirect _Scanf=_ScanfSmall --map
+#        "C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014
+#        (working CAN up&down)\Debug\List\cpp.map" --config "C:\Program Files
 #        (x86)\IAR Systems\Embedded Workbench
 #        7.0\arm\config\linker\ST\stm32f407xG.icf" --semihosting --entry
 #        __iar_program_start --redirect __iar_sh_stdout=__iar_sh_stdout_swo
@@ -81,7 +95,7 @@ __SystemLibrary = DLib
   .intvec            ro code  0x08000000   0x188  startup_stm32f4xx.o [1]
                             - 0x08000188   0x188
 
-"P1":                                     0x2394
+"P1":                                     0x239c
   .text              ro code  0x08000188   0x498  stm32f4xx_can.o [1]
   .text              ro code  0x08000620   0x100  stm32f4xx_rcc.o [1]
   .text              ro code  0x08000720   0x320  measurment_unit.o [1]
@@ -90,30 +104,28 @@ __SystemLibrary = DLib
   .text              ro code  0x08000b10   0x1fc  stm32f4xx_usart.o [1]
   .text              ro code  0x08000d0c    0x6c  misc.o [1]
   .text              ro code  0x08000d78   0x2b0  stm32f4xx_tim.o [1]
-  .text              ro code  0x08001028   0x250  Timing_lib.o [1]
-  .text              ro code  0x08001278   0x24c  ROV.o [1]
-  .text              ro code  0x080014c4   0x204  Camera_Control.o [1]
-  .text              ro code  0x080016c8   0x1a8  CAN_Lib.o [1]
-  .text              ro code  0x08001870    0xe4  Lighting_lib.o [1]
-  .text              ro code  0x08001954   0x208  Thrusters_lib.o [1]
-  .text              ro code  0x08001b5c   0x230  stm32f4xx_it.o [1]
-  .text              ro code  0x08001d8c    0x56  ABImemcpy_unaligned.o [5]
-  .text              ro code  0x08001de2    0x22  zero_init3.o [5]
-  .text              ro code  0x08001e04   0x174  communication_lib.o [1]
-  .text              ro code  0x08001f78    0xe0  system_stm32f4xx.o [1]
-  .text              ro code  0x08002058    0xa4  main.o [1]
-  .text              ro code  0x080020fc    0x28  data_init.o [5]
-  .iar.init_table    const    0x08002124    0x24  - Linker created -
-  .text              ro code  0x08002148    0x1a  fpinit_M.o [4]
-  .text              ro code  0x08002164    0x1a  cmain.o [5]
-  .text              ro code  0x0800217e     0x4  low_level_init.o [3]
-  .text              ro code  0x08002182     0x4  exit.o [3]
-  .text              ro code  0x08002188     0xa  cexit.o [5]
-  .text              ro code  0x08002194    0x14  exit.o [6]
-  .text              ro code  0x080021a8    0x10  startup_stm32f4xx.o [1]
-  .text              ro code  0x080021b8     0xc  cstartup_M.o [5]
-  .text              ro code  0x080021c4     0x4  startup_stm32f4xx.o [1]
-  .text              ro code  0x080021c8     0x4  startup_stm32f4xx.o [1]
+  .text              ro code  0x08001028   0x260  ROV.o [1]
+  .text              ro code  0x08001288   0x204  Camera_Control.o [1]
+  .text              ro code  0x0800148c   0x250  Timing_lib.o [1]
+  .text              ro code  0x080016dc   0x1a8  CAN_Lib.o [1]
+  .text              ro code  0x08001884    0xe4  Lighting_lib.o [1]
+  .text              ro code  0x08001968   0x208  Thrusters_lib.o [1]
+  .text              ro code  0x08001b70   0x218  stm32f4xx_it.o [1]
+  .text              ro code  0x08001d88    0x56  ABImemcpy_unaligned.o [5]
+  .text              ro code  0x08001dde    0x22  zero_init3.o [5]
+  .text              ro code  0x08001e00   0x170  communication_lib.o [1]
+  .text              ro code  0x08001f70    0xe0  system_stm32f4xx.o [1]
+  .text              ro code  0x08002050    0xb4  main.o [1]
+  .text              ro code  0x08002104    0x28  data_init.o [5]
+  .iar.init_table    const    0x0800212c    0x24  - Linker created -
+  .text              ro code  0x08002150    0x1a  fpinit_M.o [4]
+  .text              ro code  0x0800216c    0x1a  cmain.o [5]
+  .text              ro code  0x08002186     0x4  low_level_init.o [3]
+  .text              ro code  0x0800218a     0x4  exit.o [3]
+  .text              ro code  0x08002190     0xa  cexit.o [5]
+  .text              ro code  0x0800219c    0x14  exit.o [6]
+  .text              ro code  0x080021b0    0x10  startup_stm32f4xx.o [1]
+  .text              ro code  0x080021c0     0xc  cstartup_M.o [5]
   .text              ro code  0x080021cc     0x4  startup_stm32f4xx.o [1]
   .text              ro code  0x080021d0     0x4  startup_stm32f4xx.o [1]
   .text              ro code  0x080021d4     0x4  startup_stm32f4xx.o [1]
@@ -187,10 +199,12 @@ __SystemLibrary = DLib
   .text              ro code  0x080022e4     0x4  startup_stm32f4xx.o [1]
   .text              ro code  0x080022e8     0x4  startup_stm32f4xx.o [1]
   .text              ro code  0x080022ec     0x4  startup_stm32f4xx.o [1]
-  .rodata            const    0x080022f0     0x0  zero_init3.o [5]
-  .rodata            const    0x080022f0     0x0  copy_init3.o [5]
-  Initializer bytes  ro data  0x080022f0   0x22c  <for P2 s0>
-                            - 0x0800251c  0x2394
+  .text              ro code  0x080022f0     0x4  startup_stm32f4xx.o [1]
+  .text              ro code  0x080022f4     0x4  startup_stm32f4xx.o [1]
+  .rodata            const    0x080022f8     0x0  zero_init3.o [5]
+  .rodata            const    0x080022f8     0x0  copy_init3.o [5]
+  Initializer bytes  ro data  0x080022f8   0x22c  <for P2 s0>
+                            - 0x08002524  0x239c
 
 "P2", part 1 of 3:                         0x22c
   P2 s0                       0x20000000   0x22c  <Init block>
@@ -230,7 +244,7 @@ Zero (__iar_zero_init3)
 
 Copy (__iar_copy_init3)
     1 source range, total size 0x22c:
-          0x080022f0  0x22c
+          0x080022f8  0x22c
     1 destination range, total size 0x22c:
           0x20000000  0x22c
 
@@ -242,27 +256,27 @@ Copy (__iar_copy_init3)
 
     Module                 ro code  ro data  rw data
     ------                 -------  -------  -------
-C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project - Copie\Debug\Obj: [1]
+C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014 (working CAN up&down)\Debug\Obj: [1]
     CAN_Lib.o                  424                24
     Camera_Control.o           516                 4
     Lighting_lib.o             228
-    ROV.o                      588                 4
+    ROV.o                      608                 4
     Thrusters_lib.o            520
     Timing_lib.o               592
-    communication_lib.o        372                65
-    main.o                     164             2 432
+    communication_lib.o        368                65
+    main.o                     180             2 432
     measurment_unit.o          800      520      520
     misc.o                     108
     startup_stm32f4xx.o        708
     stm32f4xx_can.o          1 176
     stm32f4xx_gpio.o           162
-    stm32f4xx_it.o             560                22
+    stm32f4xx_it.o             536                22
     stm32f4xx_rcc.o            256       16       16
     stm32f4xx_tim.o            688
     stm32f4xx_usart.o          508
     system_stm32f4xx.o         224       20       20
     ------------------------------------------------
-    Total:                   8 594      556    3 107
+    Total:                   8 602      556    3 107
 
 command line: [2]
     ------------------------------------------------
@@ -298,7 +312,7 @@ shb_l.a: [6]
     Gaps                         6
     Linker created                       36    8 192
 ----------------------------------------------------
-    Grand Total:             8 908      592   11 299
+    Grand Total:             8 916      592   11 299
 
 
 *******************************************************************************
@@ -307,13 +321,13 @@ shb_l.a: [6]
 
 Entry                      Address   Size  Type      Object
 -----                      -------   ----  ----      ------
-?main                   0x08002165         Code  Gb  cmain.o [5]
+?main                   0x0800216d         Code  Gb  cmain.o [5]
 AHBPrescTable           0x20000200   0x10  Data  Gb  system_stm32f4xx.o [1]
 AIOP_ReceiveChar        0x080007c9  0x266  Code  Gb  measurment_unit.o [1]
 AIOP_Received_Char      0x20000224    0x1  Data  Gb  measurment_unit.o [1]
 APBAHBPrescTable        0x20000214   0x10  Data  Lc  stm32f4xx_rcc.o [1]
-BusFault_Handler        0x08001b63    0x2  Code  Gb  stm32f4xx_it.o [1]
-CAN1_RX0_IRQHandler     0x08001cef   0x6c  Code  Gb  stm32f4xx_it.o [1]
+BusFault_Handler        0x08001b77    0x2  Code  Gb  stm32f4xx_it.o [1]
+CAN1_RX0_IRQHandler     0x08001ced   0x6c  Code  Gb  stm32f4xx_it.o [1]
 CAN_ClearITPendingBit   0x08000599   0x6a  Code  Gb  stm32f4xx_can.o [1]
 CAN_DeInit              0x08000189   0x34  Code  Gb  stm32f4xx_can.o [1]
 CAN_Error_Code          0x20000c1a    0x1  Data  Gb  CAN_Lib.o [1]
@@ -325,31 +339,31 @@ CAN_Init                0x080001bd   0xde  Code  Gb  stm32f4xx_can.o [1]
 CAN_Receive             0x08000449   0x80  Code  Gb  stm32f4xx_can.o [1]
 CAN_Transmit            0x0800034b   0xb2  Code  Gb  stm32f4xx_can.o [1]
 CAN_TransmitStatus      0x080003fd   0x4c  Code  Gb  stm32f4xx_can.o [1]
-CAN_init                0x080016c9  0x114  Code  Gb  CAN_Lib.o [1]
-CAN_send                0x080017dd   0x7c  Code  Gb  CAN_Lib.o [1]
+CAN_init                0x080016dd  0x114  Code  Gb  CAN_Lib.o [1]
+CAN_send                0x080017f1   0x7c  Code  Gb  CAN_Lib.o [1]
 CRC_Count               0x20000226    0x1  Data  Gb  measurment_unit.o [1]
 CSTACK$$Base            0x20000c28          --   Gb  - Linker created -
 CSTACK$$Limit           0x20002c28          --   Gb  - Linker created -
 Cmd1                    0x20000c15    0x1  Data  Gb  Camera_Control.o [1]
 Cmd2                    0x20000c16    0x1  Data  Gb  Camera_Control.o [1]
-DebugMon_Handler        0x08001b67    0x2  Code  Gb  stm32f4xx_it.o [1]
+DebugMon_Handler        0x08001b7b    0x2  Code  Gb  stm32f4xx_it.o [1]
 Flag_10HZ               0x20000228    0x1  Data  Gb  measurment_unit.o [1]
 Flag_50HZ               0x20000227    0x1  Data  Gb  measurment_unit.o [1]
-FuncCallbackTable_INIT  0x08001f3d   0x1c  Code  Gb  communication_lib.o [1]
+FuncCallbackTable_INIT  0x08001f35   0x1c  Code  Gb  communication_lib.o [1]
 GPIO_Init               0x08000a41   0x72  Code  Gb  stm32f4xx_gpio.o [1]
 GPIO_PinAFConfig        0x08000abb   0x28  Code  Gb  stm32f4xx_gpio.o [1]
 GPIO_ResetBits          0x08000ab7    0x4  Code  Gb  stm32f4xx_gpio.o [1]
 GPIO_SetBits            0x08000ab3    0x4  Code  Gb  stm32f4xx_gpio.o [1]
-HardFault_Handler       0x08001b5f    0x2  Code  Gb  stm32f4xx_it.o [1]
-Lighting_init           0x08001871   0x7c  Code  Gb  Lighting_lib.o [1]
-Lighting_update         0x080018ed   0x56  Code  Gb  Lighting_lib.o [1]
+HardFault_Handler       0x08001b73    0x2  Code  Gb  stm32f4xx_it.o [1]
+Lighting_init           0x08001885   0x7c  Code  Gb  Lighting_lib.o [1]
+Lighting_update         0x08001901   0x56  Code  Gb  Lighting_lib.o [1]
 MeasurmentUnit_init     0x08000721   0xa6  Code  Gb  measurment_unit.o [1]
-MemManage_Handler       0x08001b61    0x2  Code  Gb  stm32f4xx_it.o [1]
-NMI_Handler             0x08001b5d    0x2  Code  Gb  stm32f4xx_it.o [1]
+MemManage_Handler       0x08001b75    0x2  Code  Gb  stm32f4xx_it.o [1]
+NMI_Handler             0x08001b71    0x2  Code  Gb  stm32f4xx_it.o [1]
 NVIC_Init               0x08000d0d   0x5c  Code  Gb  misc.o [1]
 PelcoD_Counter          0x20000c14    0x1  Data  Gb  Camera_Control.o [1]
-PelcoD_Send             0x080014c5   0xaa  Code  Gb  Camera_Control.o [1]
-PendSV_Handler          0x08001b6b    0x2  Code  Gb  stm32f4xx_it.o [1]
+PelcoD_Send             0x08001289   0xaa  Code  Gb  Camera_Control.o [1]
+PendSV_Handler          0x08001b7f    0x2  Code  Gb  stm32f4xx_it.o [1]
 RCC_AHB1PeriphClockCmd  0x080006a3   0x12  Code  Gb  stm32f4xx_rcc.o [1]
 RCC_APB1PeriphClockCmd  0x080006b5   0x12  Code  Gb  stm32f4xx_rcc.o [1]
 RCC_APB1PeriphResetCmd  0x080006d9   0x12  Code  Gb  stm32f4xx_rcc.o [1]
@@ -357,41 +371,41 @@ RCC_APB2PeriphClockCmd  0x080006c7   0x12  Code  Gb  stm32f4xx_rcc.o [1]
 RCC_APB2PeriphResetCmd  0x080006eb   0x12  Code  Gb  stm32f4xx_rcc.o [1]
 RCC_GetClocksFreq       0x08000621   0x82  Code  Gb  stm32f4xx_rcc.o [1]
 ROV                     0x2000022c  0x980  Data  Gb  main.o [1]
-ROV_Init                0x0800147d   0x44  Code  Gb  ROV.o [1]
-ROV_Req_Val             0x08001e7f   0x3e  Code  Gb  communication_lib.o [1]
-ROV_Set_Var             0x08001e05   0x4c  Code  Gb  communication_lib.o [1]
-ROV_Stream_VAR          0x08001ebd   0x28  Code  Gb  communication_lib.o [1]
+ROV_Init                0x0800122d   0x58  Code  Gb  ROV.o [1]
+ROV_Req_Val             0x08001e77   0x3e  Code  Gb  communication_lib.o [1]
+ROV_Set_Var             0x08001e01   0x48  Code  Gb  communication_lib.o [1]
+ROV_Stream_VAR          0x08001eb5   0x28  Code  Gb  communication_lib.o [1]
 ROV_Toggle_AIOP_Communication
-                        0x08001efd   0x16  Code  Gb  communication_lib.o [1]
+                        0x08001ef5   0x16  Code  Gb  communication_lib.o [1]
 ROV_Toggle_Streaming_Mode
-                        0x08001ee5   0x18  Code  Gb  communication_lib.o [1]
-ROV_VAR_Init            0x08001279  0x1f6  Code  Gb  ROV.o [1]
-RS485Cmd                0x0800163f   0x70  Code  Gb  Camera_Control.o [1]
-RS485_init              0x08001575   0xca  Code  Gb  Camera_Control.o [1]
-Region$$Table$$Base     0x08002124          --   Gb  - Linker created -
-Region$$Table$$Limit    0x08002148          --   Gb  - Linker created -
+                        0x08001edd   0x18  Code  Gb  communication_lib.o [1]
+ROV_VAR_Init            0x08001029  0x1f6  Code  Gb  ROV.o [1]
+RS485Cmd                0x08001403   0x70  Code  Gb  Camera_Control.o [1]
+RS485_init              0x08001339   0xca  Code  Gb  Camera_Control.o [1]
+Region$$Table$$Base     0x0800212c          --   Gb  - Linker created -
+Region$$Table$$Limit    0x08002150          --   Gb  - Linker created -
 Rx                      0x20000c00   0x14  Data  Gb  stm32f4xx_it.o [1]
-SVC_Handler             0x08001b69    0x2  Code  Gb  stm32f4xx_it.o [1]
-SysTick_Handler         0x08001b6d   0x16  Code  Gb  stm32f4xx_it.o [1]
+SVC_Handler             0x08001b7d    0x2  Code  Gb  stm32f4xx_it.o [1]
+SysTick_Handler         0x08001b81    0x2  Code  Gb  stm32f4xx_it.o [1]
 SystemCoreClock         0x20000210    0x4  Data  Gb  system_stm32f4xx.o [1]
-SystemInit              0x08001f79   0xc4  Code  Gb  system_stm32f4xx.o [1]
-THRUSTER_init           0x08001955  0x118  Code  Gb  Thrusters_lib.o [1]
-THRUSTER_update         0x08001a6d   0xd6  Code  Gb  Thrusters_lib.o [1]
+SystemInit              0x08001f71   0xc4  Code  Gb  system_stm32f4xx.o [1]
+THRUSTER_init           0x08001969  0x118  Code  Gb  Thrusters_lib.o [1]
+THRUSTER_update         0x08001a81   0xd6  Code  Gb  Thrusters_lib.o [1]
 TIM1_TRG_COM_TIM11_IRQHandler
-                        0x08001c61   0x30  Code  Gb  stm32f4xx_it.o [1]
+                        0x08001c5f   0x30  Code  Gb  stm32f4xx_it.o [1]
 TIM1_UP_TIM10_IRQHandler
-                        0x08001bfb   0x66  Code  Gb  stm32f4xx_it.o [1]
+                        0x08001bfb   0x64  Code  Gb  stm32f4xx_it.o [1]
 TIM8_TRG_COM_TIM14_IRQHandler
-                        0x08001cc5   0x2a  Code  Gb  stm32f4xx_it.o [1]
+                        0x08001cc3   0x2a  Code  Gb  stm32f4xx_it.o [1]
 TIM8_UP_TIM13_IRQHandler
-                        0x08001c91   0x2a  Code  Gb  stm32f4xx_it.o [1]
+                        0x08001c8f   0x2a  Code  Gb  stm32f4xx_it.o [1]
 TIM_ARRPreloadConfig    0x08000de5   0x14  Code  Gb  stm32f4xx_tim.o [1]
 TIM_ClearITPendingBit   0x08001021    0x2  Code  Gb  stm32f4xx_tim.o [1]
 TIM_Cmd                 0x08000df9   0x14  Code  Gb  stm32f4xx_tim.o [1]
 TIM_GetCapture1         0x08000ff9    0x4  Code  Gb  stm32f4xx_tim.o [1]
 TIM_GetITStatus         0x0800100d   0x14  Code  Gb  stm32f4xx_tim.o [1]
 TIM_ITConfig            0x08000ffd   0x10  Code  Gb  stm32f4xx_tim.o [1]
-TIM_Init                0x08001029  0x250  Code  Gb  Timing_lib.o [1]
+TIM_Init                0x0800148d  0x250  Code  Gb  Timing_lib.o [1]
 TIM_OC1Init             0x08000e0d   0x66  Code  Gb  stm32f4xx_tim.o [1]
 TIM_OC1PreloadConfig    0x08000fbd    0x6  Code  Gb  stm32f4xx_tim.o [1]
 TIM_OC2Init             0x08000e73   0x6c  Code  Gb  stm32f4xx_tim.o [1]
@@ -404,7 +418,7 @@ TIM_PrescalerConfig     0x08000ddf    0x6  Code  Gb  stm32f4xx_tim.o [1]
 TIM_SetCompare1         0x08000fb9    0x4  Code  Gb  stm32f4xx_tim.o [1]
 TIM_TimeBaseInit        0x08000d79   0x66  Code  Gb  stm32f4xx_tim.o [1]
 Toggle_Var_Stream_State
-                        0x08001e51   0x2e  Code  Gb  communication_lib.o [1]
+                        0x08001e49   0x2e  Code  Gb  communication_lib.o [1]
 TransmitMailbox         0x20000c19    0x1  Data  Gb  CAN_Lib.o [1]
 TxMessage               0x20000bec   0x14  Data  Gb  CAN_Lib.o [1]
 UART4_IRQHandler        0x08001b83   0x3c  Code  Gb  stm32f4xx_it.o [1]
@@ -420,46 +434,46 @@ USART_ITConfig          0x08000c81   0x30  Code  Gb  stm32f4xx_usart.o [1]
 USART_Init              0x08000ba9   0x9a  Code  Gb  stm32f4xx_usart.o [1]
 USART_ReceiveData       0x08000c79    0x8  Code  Gb  stm32f4xx_usart.o [1]
 USART_SendData          0x08000c71    0x8  Code  Gb  stm32f4xx_usart.o [1]
-UsageFault_Handler      0x08001b65    0x2  Code  Gb  stm32f4xx_it.o [1]
-__cmain                 0x08002165         Code  Gb  cmain.o [5]
-__exit                  0x08002195   0x14  Code  Gb  exit.o [6]
+UsageFault_Handler      0x08001b79    0x2  Code  Gb  stm32f4xx_it.o [1]
+__cmain                 0x0800216d         Code  Gb  cmain.o [5]
+__exit                  0x0800219d   0x14  Code  Gb  exit.o [6]
 __iar_copy_init3        0x08000ae3   0x2e  Code  Gb  copy_init3.o [5]
-__iar_data_init3        0x080020fd   0x28  Code  Gb  data_init.o [5]
-__iar_init_vfp          0x08002149         Code  Gb  fpinit_M.o [4]
-__iar_program_start     0x080021b9         Code  Gb  cstartup_M.o [5]
+__iar_data_init3        0x08002105   0x28  Code  Gb  data_init.o [5]
+__iar_init_vfp          0x08002151         Code  Gb  fpinit_M.o [4]
+__iar_program_start     0x080021c1         Code  Gb  cstartup_M.o [5]
 __iar_unaligned___aeabi_memcpy4
-                        0x08001d8d         Code  Gb  ABImemcpy_unaligned.o [5]
+                        0x08001d89         Code  Gb  ABImemcpy_unaligned.o [5]
 __iar_unaligned___aeabi_memcpy8
-                        0x08001d8d         Code  Gb  ABImemcpy_unaligned.o [5]
-__iar_zero_init3        0x08001de3   0x22  Code  Gb  zero_init3.o [5]
-__low_level_init        0x0800217f    0x4  Code  Gb  low_level_init.o [3]
+                        0x08001d89         Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_zero_init3        0x08001ddf   0x22  Code  Gb  zero_init3.o [5]
+__low_level_init        0x08002187    0x4  Code  Gb  low_level_init.o [3]
 __vector_table          0x08000000         Data  Gb  startup_stm32f4xx.o [1]
-_call_main              0x08002171         Code  Gb  cmain.o [5]
-_exit                   0x08002189         Code  Gb  cexit.o [5]
-_main                   0x0800217b         Code  Gb  cmain.o [5]
+_call_main              0x08002179         Code  Gb  cmain.o [5]
+_exit                   0x08002191         Code  Gb  cexit.o [5]
+_main                   0x08002183         Code  Gb  cmain.o [5]
 capture                 0x20000c20    0x2  Data  Gb  stm32f4xx_it.o [1]
 checksum                0x20000c17    0x1  Data  Gb  Camera_Control.o [1]
 cnt                     0x20000c1c    0x4  Data  Gb  ROV.o [1]
-communication_init      0x08001f1b   0x22  Code  Gb  communication_lib.o [1]
+communication_init      0x08001f13   0x22  Code  Gb  communication_lib.o [1]
 counter                 0x20000c1b    0x1  Data  Gb  CAN_Lib.o [1]
 crc_stm32               0x2000022a    0x2  Data  Gb  measurment_unit.o [1]
 crc_tab                 0x20000000  0x200  Data  Gb  measurment_unit.o [1]
 error_can               0x20000c22    0x1  Data  Gb  communication_lib.o [1]
-exit                    0x08002183    0x4  Code  Gb  exit.o [3]
+exit                    0x0800218b    0x4  Code  Gb  exit.o [3]
 function_pointer        0x20000bac   0x40  Data  Gb  communication_lib.o [1]
-main                    0x08002059   0x86  Code  Gb  main.o [1]
+main                    0x08002051   0x98  Code  Gb  main.o [1]
 message_length          0x20000c18    0x1  Data  Gb  CAN_Lib.o [1]
-update_pelcod_values    0x0800146f    0xe  Code  Gb  ROV.o [1]
+update_pelcod_values    0x0800121f    0xe  Code  Gb  ROV.o [1]
 
 
-[1] = C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project - Copie\Debug\Obj
+[1] = C:\Users\TOUCHI\Desktop\PFE\STM Coding\ROV Project 20.05.2014 (working CAN up&down)\Debug\Obj
 [2] = command line
 [3] = dl7M_tln.a
 [4] = m7M_tlv.a
 [5] = rt7M_tl.a
 [6] = shb_l.a
 
-   8 908 bytes of readonly  code memory
+   8 916 bytes of readonly  code memory
      592 bytes of readonly  data memory
   11 299 bytes of readwrite data memory
 

@@ -284,9 +284,15 @@ void ROV_Init(ROV_Struct* ROV)
   
   /* Initialization of ROV states */
   ROV->rov_state.is_aiop_communication_allowed = 1;
-  ROV->rov_state.is_variable_in_use = 1;
-  ROV->rov_state.is_streaming_enabled = 0;
-  ROV->rov_state.is_computer_connected = 0;
+  //ROV->rov_state.is_variable_in_use = 1;
+  //ROV->rov_state.is_streaming_enabled = 0;
+  //ROV->rov_state.is_computer_connected = 0;
+  
+  ROV->propulsion[0].speed_command.integer16 = 0;
+  ROV->propulsion[1].speed_command.integer16 = 0;
+  ROV->propulsion[2].speed_command.integer16 = 0;
+  ROV->propulsion[3].speed_command.integer16 = 0;
+  THRUSTER_update(ROV->propulsion);
   
   }
 
