@@ -5387,7 +5387,7 @@ extern "C"
 	  float32_t *pYData = S->pYData;	    /* pointer to output table */
 
 	  /* Calculation of index */
-	  i =   (x - S->x1) / xSpacing;
+	  i = (int32_t)  ((x - S->x1) / xSpacing);
 
 	  if(i < 0)
 	  {

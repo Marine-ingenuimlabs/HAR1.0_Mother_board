@@ -22,7 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include "arm_math.h"
+
 #include "communication_lib.h"
 #include <stm32f4xx_usart.h> 
 
@@ -39,7 +39,6 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-
 ROV_Struct ROV ;
 //union_float ff;
 //CanRxMsg CANMSG;
@@ -47,27 +46,166 @@ ROV_Struct ROV ;
 int tt = 0;
 
 /*
-float32_t b = 35; //thruster angle
-float32_t d = 342.64; //in millimeters
-float32_t gamma = 175; //in millimeters
-float32_t val1,val2,val3,val4,val5;
-float32_t thruster_matrix_vector[36];
-arm_matrix_instance_f32 thruster_matrix; 
-arm_matrix_instance_f32 force_moment_matrix;
-float32_t force_moment_vector[] = { 1 , 0 , 0 , 0 , 0 , 0};
-*/
 
+*/
+int tempor;
+float tempoo;
 //__IO uint8_t UserButtonPressed = 0x00;
 
 
 /* Private function prototypes -----------------------------------------------*/
-
-
+void init_USART1(uint32_t baudrate);
+void USART_puts(USART_TypeDef* USARTx,__IO char *s);
+char* conv_f2c(float f);
+float joys[8];
+uint32_t u[8];
 /* Private functions ---------------------------------------------------------*/
 
 
+  float32_t val1,val2,val3,val4,val5;
+  float32_t Thruster_Axis_Projection;
+  
+  
+  
+/**
+  * @brief  Main program
+  * @param  None
+  * @retval None
+  */
+int main(void)
+{
+    ROV_Init(&ROV);
+    FuncCallbackTable_INIT(); //initialization of functions pointers table
+    NVIC_SetPriority(SysTick_IRQn, 0x5); //configure systick priority
+    SysTick_Config(SystemCoreClock / 20000);
+    ROV_ControlMatrix_Init(&ROV); // Matrix Init 
+    ROV_coldStart_Init(&ROV);
+    ROV.rov_state.is_streaming_enabled = 0;
+    ROV.rov_state.is_computer_connected = 0;
+    init_USART1(115200);
+    
+    /**This section is used to configure the debug reporting uart*/
+    
+    ROV.light.right.integer16 = 1500;
+  
+  /* Initialize LEDs and User_Button on STM32F4-Discovery --------------------*/
+  //STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI); 
 
-//initialises USART1 used for debug
+  /* Initialization of ROV thruster config matrix used for debug only */
+  Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV.Thruster_Angle));
+  val1 = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV.Thruster_Angle))));
+  val2 = (1/(4*arm_sin_f32 (DEGREE_TO_RADUIS(ROV.Thruster_Angle))));
+  val3 = 0.5;
+  val4 = (1/(2*GAMMA));
+  val5 = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV.Thruster_Angle))));
+  
+  /*float32_t thruster_matrix_vector[36]={
+  val1, val2,0   ,0    ,0, val5,
+  val1,-val2,0   ,0    ,0,-val5,
+  val1, val2,0   ,0    ,0,-val5,
+  val1,-val2,0   ,0    ,0, val5,
+  0   ,0    ,val3, val4,0,    0,
+  0   ,0    ,val3, val4,0,    0 
+  };*/
+
+   while (1)
+   { 
+     
+   joys[0] =  ROV.joyst.x_axis.integer16;
+   joys[1] =    ROV.joyst.y_axis.integer16;
+   joys[2]  =  ROV.joyst.throttle_1.integer16;
+   joys[3] = 0;
+   joys[4] = 0;
+   joys[5] =  ROV.joyst.rz_rotation.integer16;
+   
+   //res=(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+   joys[0] =  (joys[0] - 0) * (5656 - (2828)) / (65535 - 0) + (2828);
+   //joys[0] = (map(joys[0],0,65535,-1414,1414)+1500);
+   joys[1] =  (joys[1] - 0) * (1414 - (-1414)) / (65535 - 0) + (-1414);
+   //joys[2] = (map(joys[2],0,65535,-1000,1000)+1500);
+   //joys[3] = map(joys[3],0,65535,-1000,1000);
+   //joys[4] = map(joys[4],0,65535,-1000,1000);
+   joys[5] =  (joys[5] - 0) * (398868 - (-398868))/(65535 - 0) + (-398868);
+   
+   u[0] = (uint16_t) (((joys[0]*val1 + joys[1]*val2 + joys[5]*val5)));
+   u[1] = (uint16_t) (((joys[0]*val1 + joys[1]*(-val2) + joys[5]*(-val5))));
+   u[2] = (uint16_t) (((joys[0]*val1 + joys[1]*(val2) + joys[5]*(-val5))));
+   u[3] = (uint16_t) (((joys[0]*val1 + joys[1]*(-val2) + joys[5]*(val5))));
+   
+   //tempor = ((u[0]*(-1)) + 4000);
+   //u[1] = tempor;
+   //u[2] = u[1];
+   //tempor = ((u[2]*(-1)) + 4000);
+   //u[3] = tempor;
+   //u[4]
+   //u[5]
+   
+   for(int cor = 0;cor<6;cor++)
+   {
+     if(u[cor]<1000)
+     {
+       u[cor] = 1000;
+     }
+     if(u[cor]>2000)
+     {
+       u[cor] = 2000;
+     }
+     
+   }
+   ROV.propulsion[0].speed_feedback.integer16 = u[0];
+   ROV.propulsion[1].speed_feedback.integer16 = u[1];
+   ROV.propulsion[2].speed_feedback.integer16 = u[2];
+   ROV.propulsion[3].speed_feedback.integer16 = u[3];
+    
+   //tempoo = ((floor((joys[2])/65535)*1000)+1000);
+     
+   ROV.propulsion[4].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
+   ROV.propulsion[5].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
+      //ROV.propulsion[0].speed_command.integer16 = ROV.light.left.integer16; //ROV.joyst.x_axis.integer16;
+      //ROV.propulsion[1].speed_command.integer16 = ROV.light.right.integer16; //ROV.joyst.y_axis.integer16;
+      //ROV.propulsion[2].speed_command.integer16 = ROV.joyst.throttle_1.integer16;
+      //ROV.propulsion[3].speed_command.integer16 = ROV.joyst.throttle_2.integer16;
+   //if (ROV.aio.buffers.frame_50Hz.state == )
+     
+     Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
+     Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);      
+     
+     //ROV_Routine(&ROV,joy_vector);
+ /*   if (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
+  {
+     UserButtonPressed=0;
+      // Waiting User Button is released 
+      while (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
+      {} 
+        CanTx.DLC = 4;
+  CanTx.Data[0] = 0x9A ;
+  CanTx.Data[1] = 0x99 ;
+  CanTx.Data[2] = 0xA9 ;
+  CanTx.Data[3] = 0x40;
+  //CanTx.Data[4] = 0x40;
+
+  CanTx.IDE = CAN_Id_Extended;
+  CanTx.ExtId = 0x50;
+  CAN_Transmit(CAN1, &CanTx);
+     
+    }
+     */
+   //ROV.propulsion[0].speed_command.integer16 = 0;
+   //ROV.propulsion[1].speed_command.integer16 = 0;
+   //THRUSTER_update(ROV.propulsion);
+    // ROV_Stream_VAR(ROV);
+    
+    // Delay(0x1FFFFFF);
+  }
+  
+}
+
+/**
+  * @brief  Configure the TIM3 Ouput Channels.
+  * @param  None
+  * @retval None
+  */
+
 void init_USART1(uint32_t baudrate){
 
 	/* This is a concept that has to do with the libraries provided by ST
@@ -139,143 +277,43 @@ void init_USART1(uint32_t baudrate){
 	USART_Cmd(USART1, ENABLE);
 }
 
+void USART_puts(USART_TypeDef* USARTx,__IO char *s)
+{
 
-
-
-
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-int main(void)
+	while(*s){
+		// wait until data register is empty
+		while( !(USARTx->SR & 0x00000040) ); 
+		USART_SendData(USARTx, *s);
+		*s++;
+	}
+}
+char* conv_f2c(float f)
 {
   
-  NVIC_SetPriority(SysTick_IRQn, 0x5); //configure systick priority
-  
-  /*
-  val1 = (1/(4*cos(b)));
-  val2 = (1/(4*sin(b)));
-  val3 = 0.5;
-  val4 = (1/(2*gamma));
-  val5 = (1/(2*d*cos(b)));
-  thruster_matrix_vector[0] = val1;
-  thruster_matrix_vector[1] = val2;
-  thruster_matrix_vector[2] = 0;
-  thruster_matrix_vector[3] = 0;
-  thruster_matrix_vector[4] = 0;
-  thruster_matrix_vector[5] = val5;
-  thruster_matrix_vector[6] = val1;
-  thruster_matrix_vector[7] = -val2;
-  thruster_matrix_vector[8] = 0;
-  thruster_matrix_vector[9] = 0;
-  thruster_matrix_vector[10] = 0;
-  thruster_matrix_vector[11] = -val5;
-  thruster_matrix_vector[12] = val1;
-  thruster_matrix_vector[13] = val2;
-  thruster_matrix_vector[14] = 0;
-  thruster_matrix_vector[15] = 0;
-  thruster_matrix_vector[16] = 0;
-  thruster_matrix_vector[17] = -val5;
-  thruster_matrix_vector[18] = val1;
-  thruster_matrix_vector[19] = -val2;
-  thruster_matrix_vector[20] = 0;
-  thruster_matrix_vector[21] = 0;
-  thruster_matrix_vector[22] = 0;
-  thruster_matrix_vector[23] = val5;
-  thruster_matrix_vector[24] = 0;
-  thruster_matrix_vector[25] = 0;
-  thruster_matrix_vector[26] = val3;
-  thruster_matrix_vector[27] = val4;
-  thruster_matrix_vector[28] = 0;
-  thruster_matrix_vector[29] = 0;
-  thruster_matrix_vector[30] = 0;
-  thruster_matrix_vector[31] = 0;
-  thruster_matrix_vector[32] = val3;
-  thruster_matrix_vector[33] = val4;
-  thruster_matrix_vector[34] = 0;
-  thruster_matrix_vector[35] = 0;
+    static int pint;
+    static int pfract;
+    static char string[7];
+    static int sign;
     
-  arm_mat_init_f32(&thruster_matrix, 6, 6,thruster_matrix_vector);
-  arm_mat_init_f32(&thruster_matrix, 6, 6,thruster_matrix_vector);
-  b = thruster_matrix.pData[26];
- */
- 
-  ROV_Init(&ROV);
-  FuncCallbackTable_INIT(); //initialization of functions pointers table
-  
-  SysTick_Config(SystemCoreClock / 10000);
- 
-   ROV.propulsion[0].speed_command.integer16 = 0;
-   ROV.propulsion[1].speed_command.integer16 = 0;
-   ROV.propulsion[2].speed_command.integer16 = 0;
-   ROV.propulsion[3].speed_command.integer16 = 0;
-   THRUSTER_update(ROV.propulsion);
-
-    ROV.rov_state.is_streaming_enabled = 0;
-    ROV.rov_state.is_computer_connected = 0;
+    sign=(int)f;
+    pint =(int)f;
+    pfract= (int)((f - pint)*1000);
+    pint = abs(pint);
+    pfract = abs(pfract);
     
-
- ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number = 5.3;
- ROV.measurement_unit_sensors.AHRS.Euler_Angle.y_value.floating_number = 9.6;
- ROV.measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number = 7.1;
- ROV.identifiers_table[80].State = 1;
- ROV.identifiers_table[81].State = 0;
- ROV.identifiers_table[82].State = 0;
- 
-
-  ROV.light.right.integer16 = 1500;
-  
-  /* Initialize LEDs and User_Button on STM32F4-Discovery --------------------*/
-  //STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI); 
-
-  
-   while (1)
-   { 
-      ROV.propulsion[0].speed_command.integer16 = ROV.light.left.integer16; //ROV.joyst.x_axis.integer16;
-      ROV.propulsion[1].speed_command.integer16 = ROV.light.right.integer16; //ROV.joyst.y_axis.integer16;
-      //ROV.propulsion[2].speed_command.integer16 = ROV.joyst.throttle_1.integer16;
-      //ROV.propulsion[3].speed_command.integer16 = ROV.joyst.throttle_2.integer16;
-       
-       
-      
-     
- /*   if (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
-  {
-     UserButtonPressed=0;
-      // Waiting User Button is released 
-      while (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
-      {} 
-        CanTx.DLC = 4;
-  CanTx.Data[0] = 0x9A ;
-  CanTx.Data[1] = 0x99 ;
-  CanTx.Data[2] = 0xA9 ;
-  CanTx.Data[3] = 0x40;
-  //CanTx.Data[4] = 0x40;
-
-  CanTx.IDE = CAN_Id_Extended;
-  CanTx.ExtId = 0x50;
-  CAN_Transmit(CAN1, &CanTx);
-     
+    
+    
+     if (sign < 0)
+    {
+      sprintf(string,"-%03d.%03d",pint,pfract);
+    }  
+    else
+    {
+      sprintf(string,"%03d.%03d",pint,pfract);
     }
-     */
-   //ROV.propulsion[0].speed_command.integer16 = 0;
-   //ROV.propulsion[1].speed_command.integer16 = 0;
-   //THRUSTER_update(ROV.propulsion);
-    // ROV_Stream_VAR(ROV);
-    
-    // Delay(0x1FFFFFF);
-  }
+    return string;
   
 }
-
-/**
-  * @brief  Configure the TIM3 Ouput Channels.
-  * @param  None
-  * @retval None
-  */
-
-
 
 #ifdef  USE_FULL_ASSERT
 

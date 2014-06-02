@@ -20,7 +20,8 @@ CanRxMsg RxMessage;
 CanTxMsg TxMessage;
 uint8_t CAN_Error_Code;
 #define CAN_125KB  //CAN Communication Speed
-uint8_t message_length,TransmitMailbox, CAN_Error_Code, counter=0;
+uint8_t message_length,TransmitMailbox, CAN_Error_Code;
+uint32_t  counter=0; 
 //uint8_t copy_cnt = 0;
 /*******************************************************************************
 * Function Name  : CAN_Configuration
@@ -39,14 +40,14 @@ void CAN_init(void)
 
   /* Enable GPIO clock */
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  //RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   
   /* Connect CAN pins to AF */
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource0, GPIO_AF_CAN1);
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource1, GPIO_AF_CAN1); 
   
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_CAN2);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_CAN2);
+  //GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_CAN2);
+  //GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_CAN2);
   
   /* Configure CAN RX and TX pins for CAN1*/
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
@@ -75,11 +76,11 @@ void CAN_init(void)
   /* CAN configuration ********************************************************/  
   /* Enable CAN clock */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN2, ENABLE);
+  //RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN2, ENABLE);
   
   /* CAN register init */
   CAN_DeInit(CAN1);
-  CAN_DeInit(CAN2);
+  //CAN_DeInit(CAN2);
 
   /* CAN cell init */
   CAN_InitStructure.CAN_TTCM = DISABLE;
@@ -96,7 +97,7 @@ void CAN_init(void)
   CAN_InitStructure.CAN_BS2 = CAN_BS2_6tq;
   CAN_InitStructure.CAN_Prescaler = 21;
   CAN_Init(CAN1, &CAN_InitStructure); 
-  CAN_Init(CAN2, &CAN_InitStructure); 
+  //CAN_Init(CAN2, &CAN_InitStructure); 
 
   /* CAN Baudrate = 1 MBps (CAN clocked at 30 MHz) */
 /*CAN_InitStructure.CAN_BS1 = CAN_BS1_6tq;
@@ -136,7 +137,7 @@ void CAN_init(void)
 *******************************************************************************/
 uint8_t CAN_send(uint8_t volatile *message, uint8_t messageid)
   { CanTxMsg CAN_TxMessage;
-    
+    counter=0;
    if(messageid<30){
      message_length = 1;
    }
@@ -146,7 +147,6 @@ uint8_t CAN_send(uint8_t volatile *message, uint8_t messageid)
    else{
      message_length = 4;
    }
-
     if (message_length > CAN_MAX_DATASIZE)
     {
       return 1;// Error: Message size exceeds the datafield
@@ -156,24 +156,21 @@ uint8_t CAN_send(uint8_t volatile *message, uint8_t messageid)
     CAN_TxMessage.RTR     = CAN_RTR_DATA;
     CAN_TxMessage.IDE     = CAN_ID_EXT;
     CAN_TxMessage.DLC     = message_length;
-    for(int cnt=0;cnt<message_length;cnt++)
+    for(int cnt=(message_length);cnt>0;cnt--)
     {
-      CAN_TxMessage.Data[cnt] = message[cnt];
+      CAN_TxMessage.Data[cnt-1] = message[message_length-cnt];
     }
     //memcpy(CAN_TxMessage.Data , message ,message_length ) ;  
     TransmitMailbox=CAN_Transmit(CAN1, &CAN_TxMessage);
         
-  	while((CAN_TransmitStatus(CAN1, TransmitMailbox) != CANTXOK) && (counter != 0xFF))
+  	while((CAN_TransmitStatus(CAN1, TransmitMailbox) != CANTXOK) && (counter != 0xFFFFF))
   	{counter++;
-         
          //Save in the error code attached to RTC value
  	 }
-        if (counter == 0xFF)
+        if (counter == 0xFFFFF)
           CAN_Error_Code= CAN_GetLastErrorCode (CAN1);
         
         return CAN_Error_Code;
   }
-
-
 
 /* End of file ---------------------------------------------------------------*/

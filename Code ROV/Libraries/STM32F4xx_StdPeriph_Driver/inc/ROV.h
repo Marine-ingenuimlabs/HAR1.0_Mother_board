@@ -20,8 +20,16 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "arm_math.h"
 
 
+/* Private define ------------------------------------------------------------*/
+#define pi                              3.14159265358979323846
+#define DEFAULT_THRUSTERS_ANGLE         45
+#define GAMMA                           175                              // Distance between the center of gravity and the vertical thruster axis 
+#define DIS_THRUSTER_GCENTER            282.54
+#define ALPHA                           48.4
+#define DEGREE_TO_RADUIS(x)             ((x* pi )/180)                   // This macro is used to convert angle in degree to angle in radius 
 /* Private typedef -----------------------------------------------------------*/
 
 typedef struct
@@ -126,6 +134,8 @@ typedef struct
   Joystick joyst;
   VariableID volatile identifiers_table[256];
   state_of_rov rov_state;
+  uint8_t Thruster_Angle;
+  arm_matrix_instance_f32 thruster_matrix;
   
 }ROV_Struct;
 
@@ -135,10 +145,13 @@ void ROV_VAR_Init(ROV_Struct* ROV);
 
 /* ROV Initialisation ------------------------------------------------------- */
 void ROV_Init(ROV_Struct* ROV);
-void ROV_Routine(ROV_Struct* ROV);
+void ROV_Routine(ROV_Struct *ROV,float *joystick);
 void Sensor_DataUpdate_10Hz(Sensors *destination,AIOP_10HZMessage volatile *source,state_of_rov *state);
 void Sensor_DataUpdate_50Hz(Sensors *destination,AIOP_50HZMessage volatile *source,state_of_rov *state);
 void update_pelcod_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
+void ROV_ControlMatrix_Init(ROV_Struct* ROV);
+void ROV_coldStart_Init(ROV_Struct* ROV);
+float map(float x, float in_min, float in_max, float out_min, float out_max);
 /*
 void update_thrusters_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
 void update_lighting_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);

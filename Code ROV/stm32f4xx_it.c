@@ -146,23 +146,19 @@ void PendSV_Handler(void)
 
 void SysTick_Handler(void)
 {
-  /*
-  Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz);
-  Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz);
   
-  THRUSTER_update(ROV.propulsion);
-  sle7++;
-  
- */
-  /*
-  ROV.propulsion[0].speed_command.integer16 = (19999);
-  ROV.propulsion[1].speed_command.integer16 = (19999);
-  ROV.propulsion[2].speed_command.integer16 = (19999);
-  ROV.propulsion[3].speed_command.integer16 = (19999);
-  */
-  //function_pointer[Rx.StdId](&ROV,Rx);
+  //Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
+ // Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);
   
 }
+/*******************************************************************************
+* Function Name  : TIM1_UP_TIM10_IRQHandler
+* Description    : This function handles Timer 10 interrupt 
+                   request which represent the 10 hz routine .
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void UART4_IRQHandler(void)
 {
   if(USART_GetITStatus(UART4, USART_IT_RXNE) == SET)
@@ -171,12 +167,20 @@ void UART4_IRQHandler(void)
     {
       
     AIOP_ReceiveChar((USART_ReceiveData(UART4) & 0xFF),(&(ROV.aio)));   
-    USART_ClearITPendingBit(UART4, USART_IT_RXNE);
+    
     
     }/* if communication with AIOP is enabled */
+    USART_ClearITPendingBit(UART4, USART_IT_RXNE);
   }/* if USART4 interrupt has occurred */
 }
-
+/*******************************************************************************
+* Function Name  : TIM1_UP_TIM10_IRQHandler
+* Description    : This function handles Timer 10 interrupt 
+                   request which represent the 10 hz routine .
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void USART2_IRQHandler(void)
 {
   if(USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
@@ -191,35 +195,45 @@ void USART2_IRQHandler(void)
     USART_ClearITPendingBit(USART2, USART_FLAG_TXE); 
   }
 }
+/*******************************************************************************
+* Function Name  : TIM1_UP_TIM10_IRQHandler
+* Description    : This function handles Timer 10 interrupt 
+                   request which represent the 10 hz routine .
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void TIM1_UP_TIM10_IRQHandler(void)
 {
 
   if (TIM_GetITStatus(TIM10, TIM_IT_CC1) != RESET)
   {
     if(((ROV.rov_state.is_streaming_enabled) == 1))
-    {
-      
-      //if(sle7<100)
-      //{
+    { 
         ROV_Stream_VAR(ROV);
-        //sle7++;
-      //}
-    }
-    /*if streaming is enabled */
-    
+    } /*if streaming is enabled */
     Lighting_update(&ROV.light);
-    
+    //PelcoD_Send(&ROV.pelcod);// Pelco-d functionnality is ignored in this version
     TIM_ClearITPendingBit(TIM10, TIM_IT_CC1);
     capture = TIM_GetCapture1(TIM10);
     TIM_SetCompare1(TIM10, capture + 1000);
   }
 }
+
+/*******************************************************************************
+* Function Name  : TIM1_TRG_COM_TIM11_IRQHandler
+* Description    : This function handles Timer 11 interrupt 
+                   request which represent the 50 hz routine .
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void TIM1_TRG_COM_TIM11_IRQHandler(void) //at a frequency of 50hz
 {   
   if (TIM_GetITStatus(TIM11, TIM_IT_CC1) != RESET)
   {
-/* here goes the place of the control algorithm */
-
+    //arm_mat_mult_f32(ROV.thruster_matrix
+    /* here goes the place of the control algorithm */
     THRUSTER_update(ROV.propulsion);
       
     TIM_ClearITPendingBit(TIM11, TIM_IT_CC1);
@@ -227,6 +241,14 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void) //at a frequency of 50hz
     TIM_SetCompare1(TIM11, capture + 200);
   }
 }
+/*******************************************************************************
+* Function Name  : TIM8_UP_TIM13_IRQHandler
+* Description    : This function handles Timer 13 interrupt 
+                   request which represent the 100 hz routine .
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   
@@ -238,16 +260,19 @@ void TIM8_UP_TIM13_IRQHandler(void)
     TIM_SetCompare1(TIM13, capture + 100);
   }
 }
+/*******************************************************************************
+* Function Name  : TIM8_TRG_COM_TIM14_IRQHandler
+* Description    : This function handles Timer 14 interrupt 
+                   request which represent the 1 Khz routine .
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
 
   if (TIM_GetITStatus(TIM14, TIM_IT_CC1) != RESET)
   {
-     //char dig[15]; 
-   //sprintf(dig,"%d",sle7);
-   //USART_puts(USART1, dig);
-   //USART_puts(USART1,"\n");
-   //sle7=0;
     TIM_ClearITPendingBit(TIM14, TIM_IT_CC1);
     capture = TIM_GetCapture1(TIM14);
     TIM_SetCompare1(TIM14, capture + 10);
@@ -320,7 +345,7 @@ void CAN1_RX0_IRQHandler(void)
      //Delay(0xFFFFF);
     //USART_puts(USART1,ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.integer);
     //Delay(0xFFFFF);
-  //  if(Rx.DLC<30){
+  //  if(Rx.DLC<30){    
     // sprintf(str,"%d",Rx.Data);
    //}
   // else if(Rx.DLC<70){

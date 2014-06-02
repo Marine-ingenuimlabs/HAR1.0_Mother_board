@@ -17,6 +17,7 @@ void (*function_pointer[16])(ROV_Struct*,CanRxMsg); // Functions Callback Table
 
 
 /* Private function prototypes -----------------------------------------------*/
+void print_joystick(ROV_Struct* ROV);
 /* Private functions ---------------------------------------------------------*/
 
 
@@ -38,9 +39,79 @@ void ROV_Set_Var(ROV_Struct* ROV,CanRxMsg CAN_Msg)
       ROV->identifiers_table[CAN_Msg.Data[0]].pointer[(CAN_Msg.DLC-2)-cnt] = CAN_Msg.Data[cnt+1];
     }
   ROV->rov_state.is_variable_in_use = 0;
+   
+        print_joystick(ROV); 
+   
   //}
 }
 
+void print_joystick(ROV_Struct* ROV)
+{
+          /*USART_puts(USART1,"ROLL");  
+          USART_puts(USART1,conv_f2c(ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number));
+          USART_SendData(USART1,'\r');
+          USART_SendData(USART1,'\n');
+          
+          USART_puts(USART1,"PITCH");  
+          USART_puts(USART1,conv_f2c(ROV.measurement_unit_sensors.AHRS.Euler_Angle.y_value.floating_number));
+          USART_SendData(USART1,'\r');
+          USART_SendData(USART1,'\n');
+          
+          USART_puts(USART1,"YAW");  
+          USART_puts(USART1,conv_f2c(ROV.measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number));
+          USART_SendData(USART1,'\r');
+          USART_SendData(USART1,'\n');*/
+          USART_puts(USART1,"JOY_X:\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.x_axis.integer16));
+          USART_SendData(USART1,'\t');
+
+          USART_puts(USART1,"JOY_Y\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.y_axis.integer16));
+          USART_SendData(USART1,'\t');
+   
+          USART_puts(USART1,"JOY_RZ\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.rz_rotation.integer16));
+          USART_SendData(USART1,'\t');
+          
+          USART_puts(USART1,"POV\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.pov.integer16));
+          USART_SendData(USART1,'\t');
+          
+          USART_puts(USART1,"THROTTLE_1\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.throttle_1.integer16));
+          USART_SendData(USART1,'\t');
+          
+          USART_puts(USART1,"THROTTLE_2\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.throttle_2.integer16));
+          USART_SendData(USART1,'\t');
+          
+          USART_puts(USART1,"button\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.buttons.integer16));
+          USART_SendData(USART1,'\r');
+          USART_SendData(USART1,'\n');
+         /* 
+          for(int countt=0;countt<6;countt++)
+          {
+            
+          USART_puts(USART1,"THRUSTERS\t");  
+          USART_puts(USART1,conv_f2c(ROV->propulsion[countt].speed_feedback.integer16));
+          USART_SendData(USART1,' ');
+          USART_SendData(USART1,'\n');
+          
+            
+          }
+          USART_SendData(USART1,'\n');
+          
+          USART_puts(USART1,"button\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.buttons.integer16));
+          USART_SendData(USART1,'\r');
+          USART_SendData(USART1,'\n');
+          
+          USART_puts(USART1,"button\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.buttons.integer16));
+          USART_SendData(USART1,'\r');
+          USART_SendData(USART1,'\n');*/
+}
 /*******************************************************************************
 * Function Name  : Toggle_Var_Stream_State
 * Description    : Allow or forbid one single variable from stream
@@ -66,12 +137,15 @@ void Toggle_Var_Stream_State(ROV_Struct* ROV,CanRxMsg CAN_Msg)
 *******************************************************************************/
 void ROV_Req_Val(ROV_Struct* ROV,CanRxMsg CAN_Msg)
 {
-  if(ROV->rov_state.is_variable_in_use==0)
+ // if(ROV->rov_state.is_variable_in_use==0)
+ // {
+   // ROV->rov_state.is_variable_in_use = 1;
+  if (CAN_Msg.ExtId>128)
   {
-    ROV->rov_state.is_variable_in_use = 1;
     error_can = CAN_send(ROV->identifiers_table[CAN_Msg.ExtId-128].pointer,CAN_Msg.ExtId); //Send Requested Value Referenced in identifiers_table in Rov_Struct
-    ROV->rov_state.is_variable_in_use = 0;
   }
+    //ROV->rov_state.is_variable_in_use = 0;
+  //}
 }
 
 /*******************************************************************************
