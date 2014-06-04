@@ -234,6 +234,7 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void) //at a frequency of 50hz
   {
     //arm_mat_mult_f32(ROV.thruster_matrix
     /* here goes the place of the control algorithm */
+    ROV_Routine(&ROV);
     THRUSTER_update(ROV.propulsion);
       
     TIM_ClearITPendingBit(TIM11, TIM_IT_CC1);

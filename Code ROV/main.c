@@ -43,13 +43,7 @@ ROV_Struct ROV ;
 //union_float ff;
 //CanRxMsg CANMSG;
 //CanTxMsg CanTx;
-int tt = 0;
 
-/*
-
-*/
-int tempor;
-float tempoo;
 //__IO uint8_t UserButtonPressed = 0x00;
 
 
@@ -57,16 +51,9 @@ float tempoo;
 void init_USART1(uint32_t baudrate);
 void USART_puts(USART_TypeDef* USARTx,__IO char *s);
 char* conv_f2c(float f);
-float joys[8];
-uint32_t u[8];
+
 /* Private functions ---------------------------------------------------------*/
 
-
-  float32_t val1,val2,val3,val4,val5;
-  float32_t Thruster_Axis_Projection;
-  
-  
-  
 /**
   * @brief  Main program
   * @param  None
@@ -92,12 +79,7 @@ int main(void)
   //STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI); 
 
   /* Initialization of ROV thruster config matrix used for debug only */
-  Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV.Thruster_Angle));
-  val1 = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV.Thruster_Angle))));
-  val2 = (1/(4*arm_sin_f32 (DEGREE_TO_RADUIS(ROV.Thruster_Angle))));
-  val3 = 0.5;
-  val4 = (1/(2*GAMMA));
-  val5 = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV.Thruster_Angle))));
+  
   
   /*float32_t thruster_matrix_vector[36]={
   val1, val2,0   ,0    ,0, val5,
@@ -111,61 +93,8 @@ int main(void)
    while (1)
    { 
      
-   joys[0] =  ROV.joyst.x_axis.integer16;
-   joys[1] =    ROV.joyst.y_axis.integer16;
-   joys[2]  =  ROV.joyst.throttle_1.integer16;
-   joys[3] = 0;
-   joys[4] = 0;
-   joys[5] =  ROV.joyst.rz_rotation.integer16;
    
-   //res=(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-   joys[0] =  (joys[0] - 0) * (5656 - (2828)) / (65535 - 0) + (2828);
-   //joys[0] = (map(joys[0],0,65535,-1414,1414)+1500);
-   joys[1] =  (joys[1] - 0) * (1414 - (-1414)) / (65535 - 0) + (-1414);
-   //joys[2] = (map(joys[2],0,65535,-1000,1000)+1500);
-   //joys[3] = map(joys[3],0,65535,-1000,1000);
-   //joys[4] = map(joys[4],0,65535,-1000,1000);
-   joys[5] =  (joys[5] - 0) * (398868 - (-398868))/(65535 - 0) + (-398868);
-   
-   u[0] = (uint16_t) (((joys[0]*val1 + joys[1]*val2 + joys[5]*val5)));
-   u[1] = (uint16_t) (((joys[0]*val1 + joys[1]*(-val2) + joys[5]*(-val5))));
-   u[2] = (uint16_t) (((joys[0]*val1 + joys[1]*(val2) + joys[5]*(-val5))));
-   u[3] = (uint16_t) (((joys[0]*val1 + joys[1]*(-val2) + joys[5]*(val5))));
-   
-   //tempor = ((u[0]*(-1)) + 4000);
-   //u[1] = tempor;
-   //u[2] = u[1];
-   //tempor = ((u[2]*(-1)) + 4000);
-   //u[3] = tempor;
-   //u[4]
-   //u[5]
-   
-   for(int cor = 0;cor<6;cor++)
-   {
-     if(u[cor]<1000)
-     {
-       u[cor] = 1000;
-     }
-     if(u[cor]>2000)
-     {
-       u[cor] = 2000;
-     }
-     
-   }
-   ROV.propulsion[0].speed_feedback.integer16 = u[0];
-   ROV.propulsion[1].speed_feedback.integer16 = u[1];
-   ROV.propulsion[2].speed_feedback.integer16 = u[2];
-   ROV.propulsion[3].speed_feedback.integer16 = u[3];
-    
-   //tempoo = ((floor((joys[2])/65535)*1000)+1000);
-     
-   ROV.propulsion[4].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
-   ROV.propulsion[5].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
-      //ROV.propulsion[0].speed_command.integer16 = ROV.light.left.integer16; //ROV.joyst.x_axis.integer16;
-      //ROV.propulsion[1].speed_command.integer16 = ROV.light.right.integer16; //ROV.joyst.y_axis.integer16;
-      //ROV.propulsion[2].speed_command.integer16 = ROV.joyst.throttle_1.integer16;
-      //ROV.propulsion[3].speed_command.integer16 = ROV.joyst.throttle_2.integer16;
-   //if (ROV.aio.buffers.frame_50Hz.state == )
+      
      
      Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
      Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);      

@@ -135,8 +135,8 @@ typedef struct
   VariableID volatile identifiers_table[256];
   state_of_rov rov_state;
   uint8_t Thruster_Angle;
-  arm_matrix_instance_f32 thruster_matrix;
-  
+  //arm_matrix_instance_f32 thruster_matrix;
+  float32_t thruster_matrix_coef[5];
 }ROV_Struct;
 
 /* Initialising all the variables tables for stream and the functions callback table */
@@ -145,7 +145,7 @@ void ROV_VAR_Init(ROV_Struct* ROV);
 
 /* ROV Initialisation ------------------------------------------------------- */
 void ROV_Init(ROV_Struct* ROV);
-void ROV_Routine(ROV_Struct *ROV,float *joystick);
+void ROV_Routine(ROV_Struct *ROV);
 void Sensor_DataUpdate_10Hz(Sensors *destination,AIOP_10HZMessage volatile *source,state_of_rov *state);
 void Sensor_DataUpdate_50Hz(Sensors *destination,AIOP_50HZMessage volatile *source,state_of_rov *state);
 void update_pelcod_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);

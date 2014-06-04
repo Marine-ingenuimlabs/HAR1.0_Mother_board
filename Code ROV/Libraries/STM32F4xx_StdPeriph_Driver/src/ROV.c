@@ -18,6 +18,9 @@
 /* Private variables ---------------------------------------------------------*/
 /* Global variables ----------------------------------------------------------*/
 int cnt = 0;
+float joys[8];
+uint32_t u[8];
+float32_t Thruster_Axis_Projection;
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -160,7 +163,7 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
 *******************************************************************************/
   
 void ROV_ControlMatrix_Init(ROV_Struct* ROV)
-{
+{/*
   float32_t val1,val2,val3,val4,val5;
   float32_t Thruster_Axis_Projection;
   Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
@@ -177,10 +180,19 @@ void ROV_ControlMatrix_Init(ROV_Struct* ROV)
   val1,-val2,0   ,0    ,0, val5,
   0   ,0    ,val3, val4,0,    0,
   0   ,0    ,val3, val4,0,    0 
-  };
+  };*/
   //arm_matrix_instance_f32 force_moment_matrix;
   //float32_t force_moment_vector[] = { 1 , 0 , 0 , 0 , 0 , 0};
-  arm_mat_init_f32(&ROV->thruster_matrix, 6, 6,thruster_matrix_vector);
+  //arm_mat_init_f32(&ROV->thruster_matrix, 6, 6,thruster_matrix_vector);
+  
+  Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
+  ROV->thruster_matrix_coef[0] = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+  ROV->thruster_matrix_coef[1] = (1/(4*arm_sin_f32 (DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+  ROV->thruster_matrix_coef[2] = 0.5;
+  ROV->thruster_matrix_coef[3] = (1/(2*GAMMA));
+  ROV->thruster_matrix_coef[4] = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+  
+  
   }
 /*******************************************************************************
 * Function Name  : ROV_Routine
@@ -192,9 +204,11 @@ void ROV_ControlMatrix_Init(ROV_Struct* ROV)
 
 
 
-void ROV_Routine(ROV_Struct *ROV, float32_t *joystick)
+void ROV_Routine(ROV_Struct *ROV)
 {   
-  float32_t val1,val2,val3,val4,val5;
+  
+  
+  /*float32_t val1,val2,val3,val4,val5;
   float32_t Thruster_Axis_Projection;
   Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
   val1 = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
@@ -241,7 +255,47 @@ void ROV_Routine(ROV_Struct *ROV, float32_t *joystick)
    arm_mat_init_f32(&result_matrix, 6, 1,result_matrix_tmp); 
    
   arm_mat_mult_f32(&joystick_matrix, &thruster_mat,&result_matrix);
+   */
+  
+   joys[0] = ROV->joyst.x_axis.integer16;
+   joys[1] = ROV->joyst.y_axis.integer16;
+   joys[2] = ROV->joyst.throttle_1.integer16;
+   joys[3] = 0;
+   joys[4] = 0;
+   joys[5] = ROV->joyst.rz_rotation.integer16;
    
+   //res=(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+   joys[0] = (joys[0] - 0) * (5656 - (2828)) / (65535 - 0) + (2828);
+   //joys[0] = (map(joys[0],0,65535,-1414,1414)+1500);
+   joys[1] = (joys[1] - 0) * (1414 - (-1414)) / (65535 - 0) + (-1414);
+   //joys[2] = (map(joys[2],0,65535,-1000,1000)+1500);
+   //joys[3] = map(joys[3],0,65535,-1000,1000);
+   //joys[4] = map(joys[4],0,65535,-1000,1000);
+   joys[5] = (joys[5] - 0) * (398868 - (-398868))/(65535 - 0) + (-398868);
+   
+   u[0] = (uint16_t) (((joys[0]*ROV->thruster_matrix_coef[0] + joys[1]*ROV->thruster_matrix_coef[1] + joys[5]*ROV->thruster_matrix_coef[4])));
+   u[1] = (uint16_t) (((joys[0]*ROV->thruster_matrix_coef[0] + joys[1]*(-ROV->thruster_matrix_coef[1]) + joys[5]*(-ROV->thruster_matrix_coef[4]))));
+   u[2] = (uint16_t) (((joys[0]*ROV->thruster_matrix_coef[0] + joys[1]*(ROV->thruster_matrix_coef[1]) + joys[5]*(-ROV->thruster_matrix_coef[4]))));
+   u[3] = (uint16_t) (((joys[0]*ROV->thruster_matrix_coef[0] + joys[1]*(-ROV->thruster_matrix_coef[1]) + joys[5]*(ROV->thruster_matrix_coef[4]))));
+   
+   for(int cor = 0;cor<6;cor++)
+   {
+     if(u[cor]<1000)
+     {
+       u[cor] = 1000;
+     }
+     if(u[cor]>2000)
+     {
+       u[cor] = 2000;
+     }
+   }
+   ROV->propulsion[0].speed_feedback.integer16 = u[0];
+   ROV->propulsion[1].speed_feedback.integer16 = u[1];
+   ROV->propulsion[2].speed_feedback.integer16 = u[2];
+   ROV->propulsion[3].speed_feedback.integer16 = u[3];
+   ROV->propulsion[4].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
+   ROV->propulsion[5].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
+  
 }
 /*******************************************************************************
 * Function Name  : Sensor_DataUpdate_50Hz
