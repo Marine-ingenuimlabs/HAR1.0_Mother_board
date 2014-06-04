@@ -20,7 +20,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=-1220780841
+Checksum=-827480663
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -50,6 +50,7 @@ FilePath=_ ""
 UseFilter=_ 0
 [array_types]
 Fmt0=uint8_t[4]	3	0
+Fmt1=uint8_t[8]	3	0
 [watch_formats]
 Fmt0={W}0:*s	3	0
 Fmt1={W}0:ROV.Motion.Roll.floating_number	0	7
@@ -62,9 +63,6 @@ Fmt7={W}0:message_DOF	0	7
 Fmt8={W}0:s	0	7
 Fmt9={W}0:tableau[1][2]	3	0
 Fmt10={W}0:tt	4	0
-[Trace2]
-Enabled=0
-ShowSource=0
 [SWOTraceWindow]
 PcSampling=0
 InterruptLogs=0
@@ -87,10 +85,6 @@ GraphEnabled=0
 ShowTimeLog=1
 ShowTimeSum=1
 SumSortOrder=0
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Count=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -98,9 +92,6 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[Aliases]
-Count=0
-SuppressDialog=0
 [CallStackLog]
 Enabled=0
 [DriverProfiling]
@@ -109,3 +100,10 @@ Mode=3
 Graph=0
 Symbiont=0
 Exclusions=
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Count=0
+[Aliases]
+Count=0
+SuppressDialog=0

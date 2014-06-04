@@ -39,13 +39,26 @@ void ROV_Set_Var(ROV_Struct* ROV,CanRxMsg CAN_Msg)
       ROV->identifiers_table[CAN_Msg.Data[0]].pointer[(CAN_Msg.DLC-2)-cnt] = CAN_Msg.Data[cnt+1];
     }
   ROV->rov_state.is_variable_in_use = 0;
-   
-        print_joystick(ROV); 
+  /*if (CAN_Msg.Data[0]>=45 && CAN_Msg.Data[0]<=51)
+        print_joystick(ROV); */
+  if (CAN_Msg.Data[0]==48)
+  {
+     USART_puts(USART1,"THROTTLE_1\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.throttle_1.integer16));
+          USART_SendData(USART1,'\n');
+  }
+      else if (CAN_Msg.Data[0]==49)
+      {
+          USART_puts(USART1,"THROTTLE_2\t");  
+          USART_puts(USART1,conv_f2c(ROV->joyst.throttle_2.integer16));
+          USART_SendData(USART1,'\n');
+      }
+    
    
   //}
 }
 
-void print_joystick(ROV_Struct* ROV)
+void print_joystick(ROV_Struct* ROV )
 {
           /*USART_puts(USART1,"ROLL");  
           USART_puts(USART1,conv_f2c(ROV.measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number));
@@ -61,6 +74,7 @@ void print_joystick(ROV_Struct* ROV)
           USART_puts(USART1,conv_f2c(ROV.measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number));
           USART_SendData(USART1,'\r');
           USART_SendData(USART1,'\n');*/
+ 
           USART_puts(USART1,"JOY_X:\t");  
           USART_puts(USART1,conv_f2c(ROV->joyst.x_axis.integer16));
           USART_SendData(USART1,'\t');
@@ -89,6 +103,7 @@ void print_joystick(ROV_Struct* ROV)
           USART_puts(USART1,conv_f2c(ROV->joyst.buttons.integer16));
           USART_SendData(USART1,'\r');
           USART_SendData(USART1,'\n');
+ 
          /* 
           for(int countt=0;countt<6;countt++)
           {
@@ -208,6 +223,20 @@ void communication_init(ROV_Struct* ROV,CanRxMsg RxMessage)
     ROV->rov_state.is_computer_connected = 1;
   }
 }
+/*******************************************************************************
+* Function Name  : ROV_Reset
+* Description    : This function is used to 
+* Input          : ROV Structure, Received message from CAN
+* Output         : None.
+* Return         : None.
+*******************************************************************************/
+void ROV_Reset(ROV_Struct* ROV,CanRxMsg RxMessage)
+{
+  if(((RxMessage.Data[0]=='R') || (RxMessage.Data[0]=='r')) && ((RxMessage.Data[1]=='S')||(RxMessage.Data[1]=='s')) && ((RxMessage.Data[2]=='T')||(RxMessage.Data[2]=='t')))
+  {
+  NVIC_SystemReset();
+  }
+}
 
 /*******************************************************************************
 * Function Name  : FuncCallbackTable_INIT
@@ -233,6 +262,7 @@ void FuncCallbackTable_INIT()
  //function_pointer[12] = update_thrusters_values;             
  //function_pointer[13] = update_lighting_values;       
  function_pointer[14] = Toggle_Var_Stream_State;
+ function_pointer[15] = ROV_Reset;
 }
 
 
