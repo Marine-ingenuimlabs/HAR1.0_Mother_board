@@ -30,8 +30,6 @@
 //Streaming ON/OFF
 #define IS_STREAMING(X)  (((X&STREAMING_MASK)==0x01) ? (1):(0));
 
-
-
 //Masks for state in variable identifiers tables
 #define STREAMING_MASK 0x01
 #define NEW_OLD_MASK 0x02
@@ -45,7 +43,6 @@ void ROV_Toggle_Streaming_Mode(ROV_Struct* ROV,CanRxMsg RxMessage);
 
 /* Initialization of callback function table -------------------------------- */
 void FuncCallbackTable_INIT();
-
 
 /* Streaming variables to command station via CAN --------------------------- */
 void ROV_Stream_VAR(ROV_Struct ROV); 

@@ -22,16 +22,17 @@
 #include <stdlib.h>
 #include "arm_math.h"
 
-
 /* Private define ------------------------------------------------------------*/
 #define pi                              3.14159265358979323846
 #define DEFAULT_THRUSTERS_ANGLE         45
-#define GAMMA                           175                              // Distance between the center of gravity and the vertical thruster axis 
-#define DIS_THRUSTER_GCENTER            282.54
-#define ALPHA                           48.4
+#define GAMMA                           175                   //x          // Distance between the center of gravity and the vertical thruster axis 
+#define DIS_THRUSTER_GCENTER            282.54                //y           // Distance between the center of gravity and the vectored thruster fixation point        
+#define ALPHA                           48.4                  //a           // Angle between surge and vectored thruster fixation point in the center of gravity        
 #define DEGREE_TO_RADUIS(x)             ((x* pi )/180)                   // This macro is used to convert angle in degree to angle in radius 
+#define THRUSTER_DEFAULT_CMD            1500                             // The neutral point of thruster command
+#define THRUSTER_MAX_FWRD
+#define THRUSTER_MAX_BWRD
 /* Private typedef -----------------------------------------------------------*/
-
 typedef struct
 {
   uint8_t is_variable_in_use : 1;
@@ -40,7 +41,7 @@ typedef struct
   uint8_t is_computer_connected : 1;
 }state_of_rov;
 
-typedef union _5Data
+typedef union _Data5
 {
   float floating_number;
   uint8_t integer[4];
@@ -51,10 +52,6 @@ typedef union _Data4
   uint16_t integer16;
   uint8_t integer8[2];
 }union_16to8;
-
-
-
-
 
 // 3D sensor structure
 typedef struct 
@@ -76,8 +73,6 @@ typedef struct
   Sensor_3D_with_offset Mag;
   Sensor_3D_with_no_offset Euler_Angle;
 }IMU;
-
-
 
 //sensors structure
 typedef struct  
@@ -103,7 +98,6 @@ typedef struct
   union_float Heave; 
 }DOF;
 
-
 /* universal communication structure */ 
 typedef struct
 {
@@ -122,6 +116,17 @@ typedef struct
   uint8_t volatile State;
 }VariableID;
 
+typedef struct
+{
+  uint16_t Max_Forward_Force;
+  uint16_t Max_Backward_Force;
+  uint16_t Max_Lateral_Force;
+  uint16_t Min_Lateral_Force;
+  uint16_t Max_Rz_Torque;
+  uint16_t Min_Rz_Torque;
+
+}Control_Data;
+
 //ROV main structure
 typedef struct 
 {
@@ -135,15 +140,19 @@ typedef struct
   VariableID volatile identifiers_table[256];
   state_of_rov rov_state;
   uint8_t Thruster_Angle;
-  //arm_matrix_instance_f32 thruster_matrix;
+  Control_Data Control;
+  arm_matrix_instance_f32 Rational_to_Thruster_forces_Matrix ;
+  arm_matrix_instance_f32 Thruster_to_Rational_forces_Matrix;
+  arm_matrix_instance_f32 X_Orders_Limit; // this matrix helps on the mapping of the incomming orders from the joystick  
+  arm_matrix_instance_f32 Y_Orders_Limit;
+  arm_matrix_instance_f32 Z_Orders_Limit;
+  arm_matrix_instance_f32 Rz_Orders_Limit;
   float32_t thruster_matrix_coef[5];
 }ROV_Struct;
 
 /* Initialising all the variables tables for stream and the functions callback table */
+
 void ROV_VAR_Init(ROV_Struct* ROV);
-
-
-/* ROV Initialisation ------------------------------------------------------- */
 void ROV_Init(ROV_Struct* ROV);
 void ROV_Routine(ROV_Struct *ROV);
 void Sensor_DataUpdate_10Hz(Sensors *destination,AIOP_10HZMessage volatile *source,state_of_rov *state);
@@ -152,16 +161,10 @@ void update_pelcod_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
 void ROV_ControlMatrix_Init(ROV_Struct* ROV);
 void ROV_coldStart_Init(ROV_Struct* ROV);
 float map(float x, float in_min, float in_max, float out_min, float out_max);
-/*
-void update_thrusters_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
-void update_lighting_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
-void update_joystick_values(ROV_Struct* ROV,CanRxMsg CAN_Msg);
-*/
 void communication_init(ROV_Struct* ROV,CanRxMsg RxMessage);
-
-
 
 //Les fonctions suivantes sont utilisées pour le débogage
 char* conv_f2c(float f); // convert from float to char
 void USART_puts(USART_TypeDef* USARTx,__IO char *s); //print via serial port
 void Delay(__IO uint32_t nCount);
+ void Matrix_Debug_Print(arm_matrix_instance_f32 *mat);

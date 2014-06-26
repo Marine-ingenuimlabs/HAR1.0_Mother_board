@@ -37,16 +37,12 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#define ROV_DEBUG
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 ROV_Struct ROV ;
-//union_float ff;
-//CanRxMsg CANMSG;
-//CanTxMsg CanTx;
-
-//__IO uint8_t UserButtonPressed = 0x00;
-
-
+const uint8_t test = 2;
 /* Private function prototypes -----------------------------------------------*/
 void init_USART1(uint32_t baudrate);
 void USART_puts(USART_TypeDef* USARTx,__IO char *s);
@@ -54,79 +50,23 @@ char* conv_f2c(float f);
 
 /* Private functions ---------------------------------------------------------*/
 
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
 int main(void)
-{
-    ROV_Init(&ROV);
-    FuncCallbackTable_INIT(); //initialization of functions pointers table
-    NVIC_SetPriority(SysTick_IRQn, 0x5); //configure systick priority
-    SysTick_Config(SystemCoreClock / 20000);
-    ROV_ControlMatrix_Init(&ROV); // Matrix Init 
-    ROV_coldStart_Init(&ROV);
-    ROV.rov_state.is_streaming_enabled = 0;
-    ROV.rov_state.is_computer_connected = 0;
+{   
+#ifdef ROV_DEBUG
+    /* This section is used to configure the debug reporting uart*/
     init_USART1(115200);
-    
-    /**This section is used to configure the debug reporting uart*/
-    
-    ROV.light.right.integer16 = 1500;
+#endif
+    ROV_Init(&ROV);
+    ROV_coldStart_Init(&ROV);
+    FuncCallbackTable_INIT(); //initialization of functions pointers table
   
-  /* Initialize LEDs and User_Button on STM32F4-Discovery --------------------*/
-  //STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI); 
 
   /* Initialization of ROV thruster config matrix used for debug only */
-  
-  
-  /*float32_t thruster_matrix_vector[36]={
-  val1, val2,0   ,0    ,0, val5,
-  val1,-val2,0   ,0    ,0,-val5,
-  val1, val2,0   ,0    ,0,-val5,
-  val1,-val2,0   ,0    ,0, val5,
-  0   ,0    ,val3, val4,0,    0,
-  0   ,0    ,val3, val4,0,    0 
-  };*/
-
    while (1)
-   { 
-     
-   
-      
-     
+   {  
      Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
      Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);      
-     
-     //ROV_Routine(&ROV,joy_vector);
- /*   if (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
-  {
-     UserButtonPressed=0;
-      // Waiting User Button is released 
-      while (STM_EVAL_PBGetState(BUTTON_USER) == Bit_SET)
-      {} 
-        CanTx.DLC = 4;
-  CanTx.Data[0] = 0x9A ;
-  CanTx.Data[1] = 0x99 ;
-  CanTx.Data[2] = 0xA9 ;
-  CanTx.Data[3] = 0x40;
-  //CanTx.Data[4] = 0x40;
-
-  CanTx.IDE = CAN_Id_Extended;
-  CanTx.ExtId = 0x50;
-  CAN_Transmit(CAN1, &CanTx);
-     
-    }
-     */
-   //ROV.propulsion[0].speed_command.integer16 = 0;
-   //ROV.propulsion[1].speed_command.integer16 = 0;
-   //THRUSTER_update(ROV.propulsion);
-    // ROV_Stream_VAR(ROV);
-    
-    // Delay(0x1FFFFFF);
   }
-  
 }
 
 /**
@@ -134,7 +74,6 @@ int main(void)
   * @param  None
   * @retval None
   */
-
 void init_USART1(uint32_t baudrate){
 
 	/* This is a concept that has to do with the libraries provided by ST
@@ -200,7 +139,7 @@ void init_USART1(uint32_t baudrate){
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;// this sets the priority group of the USART1 interrupts
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		 // this sets the subpriority inside the group
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			 // the USART1 interrupts are globally enabled
-	NVIC_Init(&NVIC_InitStructure);							 // the properties are passed to the NVIC_Init function which takes care of the low level stuff	
+	NVIC_Init(&NVIC_InitStructure);				        // the properties are passed to the NVIC_Init function which takes care of the low level stuff	
 
 	// finally this enables the complete USART1 peripheral
 	USART_Cmd(USART1, ENABLE);
@@ -272,6 +211,4 @@ void assert_failed(uint8_t *file, uint32_t line)
 /**
   * @}
   */ 
-
-
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

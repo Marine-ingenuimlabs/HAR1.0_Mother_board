@@ -12,18 +12,26 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define ID_TABLE_LENGTH 105
-
+#define ID_TABLE_LENGTH                 105
+#define SYSTICK_PRIORITY                0x5
+#define SYSTICK_FRQ                     20000
+#define BYTE_VAR_SECTION                0
+#define HALFWORD_VAR_SECTION            30
+#define WORD_VAR_SECTION                74
+#define VARIABLES_ID_LIMIT              255
+#define MAX_FRW_THRUSTER_SPEED          500
+#define MAX_BCKW_THRUSTER_SPEED         -500
 /* Private macro -------------------------------------------------------------*/
+#define _IS_AN_ONE_BYTE_VARIABLE(x)     ((BYTE_VAR_SECTION <=x && x< HALFWORD_VAR_SECTION))
+#define _IS_A_TWO_BYTES_VARIABLE(x)     ((HALFWORD_VAR_SECTION <=x && x< WORD_VAR_SECTION))
+#define _IS_A_FOUR_BYTES_VARIABLE(x)    ((WORD_VAR_SECTION <=x && x< VARIABLES_ID_LIMIT ))
 /* Private variables ---------------------------------------------------------*/
 /* Global variables ----------------------------------------------------------*/
-int cnt = 0;
+
 float joys[8];
 uint32_t u[8];
 float32_t Thruster_Axis_Projection;
 /* Private function prototypes -----------------------------------------------*/
-
-
 /*******************************************************************************
 * Function Name  : ROV_VAR_Init
 * Description    : Initialization of variable streaming table and function callback table
@@ -32,10 +40,10 @@ float32_t Thruster_Axis_Projection;
 * Return         : None.
 *******************************************************************************/
 void ROV_VAR_Init(ROV_Struct* ROV_var)
-{
-   
-    /* PelcoD ---------------------------- */ // This set of variables will not be used in this version 
-  /*ROV->identifiers_table[0].pointer = &ROV->PelcoD.sense;
+{ 
+  /* PelcoD ---------------------------- */ 
+  /*This set of variables will not be used in this version 
+  ROV->identifiers_table[0].pointer = &ROV->PelcoD.sense;
   ROV->identifiers_table[1].pointer = &ROV->PelcoD.toggle_automan;
   ROV->identifiers_table[2].pointer = &ROV->PelcoD.toggle_onoff;
   ROV->identifiers_table[3].pointer = &ROV->PelcoD.iris_close;
@@ -53,14 +61,13 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
     /* Thrusters Angle ------------------------- */
   ROV_var->identifiers_table[15].pointer = &ROV_var->Thruster_Angle; 
   /* Cam Angle pen ------------------------ */
-  //ROV->identifiers_table[30].pointer = ROV->CamAngle;
+  //ROV_var->identifiers_table[30].pointer = ROV_var->CamAngle;
 
   /* Front light of ROV ------------------- */
   ROV_var->identifiers_table[31].pointer = ROV_var->light.right.integer8;
   ROV_var->identifiers_table[32].pointer = ROV_var->light.left.integer8;
   
   /* Thrusters ------------------------- */
-
   ROV_var->identifiers_table[33].pointer = ROV_var->propulsion[0].speed_command.integer8;
   ROV_var->identifiers_table[34].pointer = ROV_var->propulsion[1].speed_command.integer8;
   ROV_var->identifiers_table[35].pointer = ROV_var->propulsion[2].speed_command.integer8;
@@ -97,14 +104,17 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
   ROV_var->identifiers_table[74].pointer = ROV_var->measurement_unit_sensors.AHRS.Gyro.x_value.integer;
   ROV_var->identifiers_table[75].pointer = ROV_var->measurement_unit_sensors.AHRS.Gyro.y_value.integer;
   ROV_var->identifiers_table[76].pointer = ROV_var->measurement_unit_sensors.AHRS.Gyro.z_value.integer;
+  
   /* Accelerometer variables ------------ */
   ROV_var->identifiers_table[77].pointer = ROV_var->measurement_unit_sensors.AHRS.Accel.x_value.integer;
   ROV_var->identifiers_table[78].pointer = ROV_var->measurement_unit_sensors.AHRS.Accel.y_value.integer;
   ROV_var->identifiers_table[79].pointer = ROV_var->measurement_unit_sensors.AHRS.Accel.z_value.integer;
+  
   /* Euler Angles ---------------------- */
   ROV_var->identifiers_table[80].pointer = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.x_value.integer;
   ROV_var->identifiers_table[81].pointer = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.y_value.integer;
   ROV_var->identifiers_table[82].pointer = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.z_value.integer;
+  
   /* Depth ----------------------------- */
   ROV_var->identifiers_table[83].pointer = ROV_var->measurement_unit_sensors.Pressure.integer;
   
@@ -136,17 +146,18 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
   ROV_var->identifiers_table[104].pointer = ROV_var->measurement_unit_sensors.Onboard_Temprature.integer;
   ROV_var->identifiers_table[105].pointer = ROV_var->measurement_unit_sensors.Water_Temprature.integer;
   
- for(cnt=0;cnt<ID_TABLE_LENGTH ;cnt++) //Set all the variables OFF from stream and initialize them at 0
+ for(int cnt=0;cnt<ID_TABLE_LENGTH ;cnt++) //Set all the variables OFF from stream and initialize them at 0
  {
    ROV_var->identifiers_table[cnt].State = 0;
-    if(cnt<30){
+    if(_IS_AN_ONE_BYTE_VARIABLE(cnt))
+    {
      ROV_var->identifiers_table[cnt].pointer[0] = 0;
-   }/* if size if one octet */
-   else if(cnt<70){
+     }/* if size if one octet */
+    if(_IS_A_TWO_BYTES_VARIABLE(cnt)){
      ROV_var->identifiers_table[cnt].pointer[0] = 0;
      ROV_var->identifiers_table[cnt].pointer[1] = 0;
    }/* if size if two octet */
-   else{
+    if(_IS_A_FOUR_BYTES_VARIABLE(cnt)){
      ROV_var->identifiers_table[cnt].pointer[0] = 0;
      ROV_var->identifiers_table[cnt].pointer[1] = 0;
      ROV_var->identifiers_table[cnt].pointer[3] = 0;
@@ -154,6 +165,7 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
    }/* if size if four octet */
  }
 }
+
 /*******************************************************************************
 * Function Name  : ROV_ControlMatrix_Init
 * Description    : Initialize the thrusters configuration matrix 
@@ -161,9 +173,24 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-  
 void ROV_ControlMatrix_Init(ROV_Struct* ROV)
-{/*
+{ 
+  /*This is the initialization of the thrusters to rational forces conversion matrix*/
+  float CosBeta=arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle)); //Beta stands for the thruster angle 
+  float SinBeta=arm_sin_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle));
+  float d= DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(ALPHA-ROV->Thruster_Angle) );
+  float32_t thruster_direct_matrix_vector[36]=
+  {
+    CosBeta   , CosBeta   , CosBeta   , CosBeta   ,  0       ,  0       ,
+    SinBeta   ,-SinBeta   , SinBeta   ,-SinBeta   ,  0       ,  0       ,
+      0       ,  0        ,  0        ,  0        ,  1       ,  1       , 
+      0       ,  0        ,  0        ,  0        , -GAMMA   ,  GAMMA   ,
+      0       ,  0        ,  0        ,  0        ,  0       ,  0       ,
+    d*CosBeta ,-d*CosBeta ,-d*CosBeta ,d*CosBeta  ,  0       ,  0       ,
+  };
+  arm_mat_init_f32(&ROV->Thruster_to_Rational_forces_Matrix, 6, 6,&thruster_direct_matrix_vector[0]);  
+  //Matrix_Debug_Print(&ROV->Thruster_to_Rational_forces_Matrix);
+  /*This is the initialization of the  rational to thrusters forces conversion matrix*/
   float32_t val1,val2,val3,val4,val5;
   float32_t Thruster_Axis_Projection;
   Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
@@ -172,27 +199,98 @@ void ROV_ControlMatrix_Init(ROV_Struct* ROV)
   val3 = 0.5;
   val4 = (1/(2*GAMMA));
   val5 = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
-  
-  float32_t thruster_matrix_vector[36]={
+  float32_t thruster_inverted_matrix_vector[36]={
   val1, val2,0   ,0    ,0, val5,
   val1,-val2,0   ,0    ,0,-val5,
   val1, val2,0   ,0    ,0,-val5,
   val1,-val2,0   ,0    ,0, val5,
   0   ,0    ,val3, val4,0,    0,
   0   ,0    ,val3, val4,0,    0 
-  };*/
-  //arm_matrix_instance_f32 force_moment_matrix;
-  //float32_t force_moment_vector[] = { 1 , 0 , 0 , 0 , 0 , 0};
-  //arm_mat_init_f32(&ROV->thruster_matrix, 6, 6,thruster_matrix_vector);
+  };
+  arm_mat_init_f32(&ROV->Rational_to_Thruster_forces_Matrix, 6, 6,thruster_inverted_matrix_vector);
+   /*This is the initialization of the order's limitation matrix*/
+   arm_matrix_instance_f32 Thrsuters_Speed_Limit;
+   float32_t init_tab[12];
+   
+   /* The initialization of Orders limitation following the X axis */
+  arm_mat_init_f32(&ROV->X_Orders_Limit,6,2,init_tab);
+  float32_t X_Orders_limitation_matrix_vector[12]={
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  0,0,
+  0,0
+  }; 
+  arm_mat_init_f32(&Thrsuters_Speed_Limit, 6, 2,X_Orders_limitation_matrix_vector);
+  arm_mat_mult_f32(&ROV->Thruster_to_Rational_forces_Matrix,&Thrsuters_Speed_Limit,&ROV->X_Orders_Limit);
+  Matrix_Debug_Print(&ROV->X_Orders_Limit);
   
-  Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
-  ROV->thruster_matrix_coef[0] = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
-  ROV->thruster_matrix_coef[1] = (1/(4*arm_sin_f32 (DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
-  ROV->thruster_matrix_coef[2] = 0.5;
-  ROV->thruster_matrix_coef[3] = (1/(2*GAMMA));
-  ROV->thruster_matrix_coef[4] = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+  /* The initialization of Orders limitation following the Y axis */
+  arm_mat_init_f32(&ROV->Y_Orders_Limit,6,2,init_tab);
+  float32_t Y_Orders_limitation_matrix_vector[12]={
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_BCKW_THRUSTER_SPEED,MAX_FRW_THRUSTER_SPEED,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_BCKW_THRUSTER_SPEED,MAX_FRW_THRUSTER_SPEED,
+  0,0,
+  0,0
+  };
+  arm_mat_init_f32(&Thrsuters_Speed_Limit, 6, 2,Y_Orders_limitation_matrix_vector);
+  arm_mat_mult_f32(&ROV->Thruster_to_Rational_forces_Matrix,&Thrsuters_Speed_Limit,&ROV->Y_Orders_Limit);
+  Matrix_Debug_Print(&ROV->Y_Orders_Limit);
   
+  /* The initialization of Orders limitation following the Z axis */
+  arm_mat_init_f32(&ROV->Z_Orders_Limit,6,2,init_tab);
+  float32_t Z_Orders_limitation_matrix_vector[12]={
+  0,0,
+  0,0,
+  0,0,
+  0,0,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  }; 
+  arm_mat_init_f32(&Thrsuters_Speed_Limit, 6, 2,Z_Orders_limitation_matrix_vector);
+  arm_mat_mult_f32(&ROV->Thruster_to_Rational_forces_Matrix,&Thrsuters_Speed_Limit,&ROV->Z_Orders_Limit);
+  Matrix_Debug_Print(&ROV->Z_Orders_Limit);
   
+  /* The initialization of Orders limitation for turning around the Z axis */
+  arm_mat_init_f32(&ROV->Rz_Orders_Limit,6,2,init_tab);
+  float32_t Rz_Orders_limitation_matrix_vector[12]={
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  MAX_BCKW_THRUSTER_SPEED,MAX_FRW_THRUSTER_SPEED,
+  MAX_BCKW_THRUSTER_SPEED,MAX_FRW_THRUSTER_SPEED,
+  MAX_FRW_THRUSTER_SPEED,MAX_BCKW_THRUSTER_SPEED,
+  0,0,
+  0,0
+  };
+  arm_mat_init_f32(&Thrsuters_Speed_Limit, 6, 2,Rz_Orders_limitation_matrix_vector);
+  arm_mat_mult_f32(&ROV->Thruster_to_Rational_forces_Matrix,&Thrsuters_Speed_Limit,&ROV->Rz_Orders_Limit);
+  Matrix_Debug_Print(&ROV->Rz_Orders_Limit);
+  
+  }
+/* in this function we are assuming that the speed and thrust of the thrusters are 
+   linearly dependent. We use the maximal and the minimal speed as respesively the 
+   maximal and the minimal thrust*/
+
+/*******************************************************************************
+* Function Name  : Matrix_Debug_Print
+* Description    : Print the matrix contain in the debug 
+* Input          : mat: matrix to print in the terminal I/O window 
+* Output         : None.
+* Return         : None.
+*******************************************************************************/
+  void Matrix_Debug_Print(arm_matrix_instance_f32 *mat)
+  { 
+    USART_puts(USART1,"Matrix  : \r\n");
+    for(int mat_counter=0;mat_counter<(mat->numCols*mat->numRows);mat_counter++)
+    { USART_puts(USART1,conv_f2c(mat->pData[mat_counter]));
+      USART_puts(USART1," , ");   
+      if ((mat_counter+1)% mat->numCols ==0)
+      {
+        USART_puts(USART1,"\r\n");
+      }
+    }
   }
 /*******************************************************************************
 * Function Name  : ROV_Routine
@@ -201,62 +299,48 @@ void ROV_ControlMatrix_Init(ROV_Struct* ROV)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-
-
-
 void ROV_Routine(ROV_Struct *ROV)
 {   
-  
-  
-  /*float32_t val1,val2,val3,val4,val5;
-  float32_t Thruster_Axis_Projection;
-  Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
-  val1 = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
-  val2 = (1/(4*arm_sin_f32 (DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
-  val3 = 0.5;
-  val4 = (1/(2*GAMMA));
-  val5 = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
-  
-   float32_t thruster_matrix_vector[36]={
-  val1, val2,0   ,0    ,0, val5,
-  val1,-val2,0   ,0    ,0,-val5,
-  val1, val2,0   ,0    ,0,-val5,
-  val1,-val2,0   ,0    ,0, val5,
-  0   ,0    ,val3, val4,0,    0,
-  0   ,0    ,val3, val4,0,    0 
-  };
-  
-  float32_t result_matrix_tmp[6]; 
-  float32_t init_rov_matrix[6*6];
-  
-  arm_matrix_instance_f32 joystick_matrix;
-  arm_matrix_instance_f32 thruster_mat;
-  arm_matrix_instance_f32 result_matrix;
-   
-  //uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max)
-  joystick[0] = (float) ROV->joyst.x_axis.integer16;
+  //arm_mat_mult_f32()
+    /*float32_t val1,val2,val3,val4,val5;
+    float32_t Thruster_Axis_Projection;
+    Thruster_Axis_Projection = DIS_THRUSTER_GCENTER * arm_cos_f32(DEGREE_TO_RADUIS(90 - ALPHA- ROV->Thruster_Angle));
+    val1 = (1/(4*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+    val2 = (1/(4*arm_sin_f32 (DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+    val3 = 0.5;
+    val4 = (1/(2*GAMMA));
+    val5 = (1/(4*Thruster_Axis_Projection*arm_cos_f32(DEGREE_TO_RADUIS(ROV->Thruster_Angle))));
+    float32_t thruster_matrix_vector[36]={
+    val1, val2,0   ,0    ,0, val5,
+    val1,-val2,0   ,0    ,0,-val5,
+    val1, val2,0   ,0    ,0,-val5,
+    val1,-val2,0   ,0    ,0, val5,
+    0   ,0    ,val3, val4,0,    0,
+    0   ,0    ,val3, val4,0,    0 
+    };
+   float32_t result_matrix_tmp[6]; 
+   float32_t init_rov_matrix[6*6];
+   arm_matrix_instance_f32 joystick_matrix;
+   arm_matrix_instance_f32 thruster_mat;
+   arm_matrix_instance_f32 result_matrix; 
+   //uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max)
+   joystick[0] = (float) ROV->joyst.x_axis.integer16;
    joystick[1] = (float)   ROV->joyst.y_axis.integer16;
    joystick[2]  = (float) ROV->joyst.throttle_1.integer16;
    joystick[3] = 0;
    joystick[4] = 0;
    joystick[5] = (float) ROV->joyst.rz_rotation.integer16;
-   
    joystick[0] = map(joystick[0],0,65535,-1414,1414);
    joystick[1] = map(joystick[1],0,65535,-1414,1414);
    joystick[2] = map(joystick[2],0,65535,-1000,1000);
    //joystick[3] = map(joystick[3],0,65535,-1000,1000);
    //joystick[4] = map(joystick[4],0,65535,-1000,1000);
    joystick[5] = map(joystick[5],0,65535,-398868,398868);
-   
-
-    
    arm_mat_init_f32(&thruster_mat, 6, 6,thruster_matrix_vector); 
    arm_mat_init_f32(&joystick_matrix, 6, 1,joystick); 
    arm_mat_init_f32(&result_matrix, 6, 1,result_matrix_tmp); 
-   
-  arm_mat_mult_f32(&joystick_matrix, &thruster_mat,&result_matrix);
+   arm_mat_mult_f32(&joystick_matrix, &thruster_mat,&result_matrix);
    */
-  
    joys[0] = ROV->joyst.x_axis.integer16;
    joys[1] = ROV->joyst.y_axis.integer16;
    joys[2] = ROV->joyst.throttle_1.integer16;
@@ -297,6 +381,7 @@ void ROV_Routine(ROV_Struct *ROV)
    ROV->propulsion[5].speed_feedback.integer16 = ((((float)((joys[2])/65535))*1000)+1000);
   
 }
+
 /*******************************************************************************
 * Function Name  : Sensor_DataUpdate_50Hz
 * Description    : Copying the 50Hz buffer data to the sensor structure
@@ -308,8 +393,6 @@ void Sensor_DataUpdate_50Hz(Sensors *destination,AIOP_50HZMessage volatile *sour
 {
   if(source->state == DATA_READY)
   {
-   //if( state->is_variable_in_use == 0)
-   //{
     state->is_variable_in_use = 1; 
     source->state = DATA_PROCESSING;
     /* Updating Euler Angles ---------------------- */
@@ -324,12 +407,8 @@ void Sensor_DataUpdate_50Hz(Sensors *destination,AIOP_50HZMessage volatile *sour
     destination->AHRS.Gyro.x_value.floating_number = source->Gyrox.floating_number;
     destination->AHRS.Gyro.y_value.floating_number = source->Gyroy.floating_number;
     destination->AHRS.Gyro.z_value.floating_number = source->Gyroz.floating_number;
-    
-   
-    
     source->state = IDLE;
     state->is_variable_in_use = 0;
-  // }
   } /* if new data is ready to be copied */
 }
 
@@ -395,34 +474,38 @@ void ROV_Init(ROV_Struct* ROV)
   /* Initialization of the state machine handling AIOP communciation */
   ROV->aio.buffers.frame_10Hz.state = IDLE;
   ROV->aio.buffers.frame_50Hz.state = IDLE;
-  
-  
+
+  NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIORITY); //configure systick priority
+  SysTick_Config(SystemCoreClock / SYSTICK_FRQ);
+  ROV_ControlMatrix_Init(ROV); // Matrix Init 
+  //ROV_ControlMatrix_Init(ROV);
 }
 
+/*******************************************************************************
+* Function Name  : ROV_coldStart_Init
+* Description    : Initialisation of ROV's variables
+* Input          : ROV Structure, Received message from CAN
+* Output         : None.
+* Return         : None.
+*******************************************************************************/
 void ROV_coldStart_Init(ROV_Struct* ROV)
 {
-    ROV->propulsion[0].speed_command.integer16 = 1500;
-    ROV->propulsion[1].speed_command.integer16 = 1500;
-    ROV->propulsion[2].speed_command.integer16 = 1500;
-    ROV->propulsion[3].speed_command.integer16 = 1500;
-    ROV->propulsion[4].speed_command.integer16 = 1500;
-    ROV->propulsion[5].speed_command.integer16 = 1500;
-    
-    THRUSTER_update(ROV->propulsion);
-    
-    ROV->propulsion[0].speed_feedback.integer16 = 1500;
-    ROV->propulsion[1].speed_feedback.integer16 = 1500;
-    ROV->propulsion[2].speed_feedback.integer16 = 1500;
-    ROV->propulsion[3].speed_feedback.integer16 = 1500;
-    ROV->propulsion[4].speed_feedback.integer16 = 1500;
-    ROV->propulsion[5].speed_feedback.integer16 = 1500;
+    ROV->propulsion[0].speed_command.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[1].speed_command.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[2].speed_command.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[3].speed_command.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[4].speed_command.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[5].speed_command.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[0].speed_feedback.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[1].speed_feedback.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[2].speed_feedback.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[3].speed_feedback.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[4].speed_feedback.integer16 = THRUSTER_DEFAULT_CMD;
+    ROV->propulsion[5].speed_feedback.integer16 = THRUSTER_DEFAULT_CMD;
     ROV->joyst.buttons.integer16=0;
     ROV->joyst.pov.integer16=0;
-    
-    
     ROV->rov_state.is_streaming_enabled = 0;
     ROV->rov_state.is_computer_connected = 0;
-    
     ROV->measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number = 5.3;
     ROV->measurement_unit_sensors.AHRS.Euler_Angle.y_value.floating_number = 9.6;
     ROV->measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number = 7.1;
@@ -437,14 +520,25 @@ void ROV_coldStart_Init(ROV_Struct* ROV)
     ROV->identifiers_table[42].State = 1;
     ROV->identifiers_table[43].State = 1;
     ROV->identifiers_table[44].State = 1;
-    
-
-    ROV->light.right.integer16 = 50;
+    //ROV->light.right.integer16 = 50;
+    ROV->Thruster_Angle=DEFAULT_THRUSTERS_ANGLE;
+    THRUSTER_update(ROV->propulsion);
 }
 
-float map(float x, float in_min, float in_max, float out_min, float out_max)
+/*******************************************************************************
+* Function Name  : map
+* Description    : Variable range remapping 
+* Input          : Value:
+                   in_min:
+                   in_max:
+                   out_min:
+                   out_max:
+* Output         : None.
+* Return         : None.
+*******************************************************************************/
+float map(float Value, float in_min, float in_max, float out_min, float out_max)
         {
-            float res=(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            float res=(Value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
             if (res < out_min)
             {
                 res = out_min;
@@ -456,7 +550,13 @@ float map(float x, float in_min, float in_max, float out_min, float out_max)
             return res;
 
         }
-
+/*******************************************************************************
+* Function Name  : Delay
+* Description    : Sample decrement delay 
+* Input          : nCount
+* Output         : None.
+* Return         : None.
+*******************************************************************************/
 void Delay(__IO uint32_t nCount)
 {
   while(nCount--)
