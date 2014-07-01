@@ -64,8 +64,10 @@ int main(void)
   /* Initialization of ROV thruster config matrix used for debug only */
    while (1)
    {  
-     Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
-     Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);      
+     //Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
+     //Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);     
+     
+     //ROV.CAN_buffer[1][257];
   }
 }
 

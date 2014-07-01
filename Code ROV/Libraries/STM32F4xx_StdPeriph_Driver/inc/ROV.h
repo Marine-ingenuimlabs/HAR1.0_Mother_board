@@ -32,6 +32,8 @@
 #define THRUSTER_DEFAULT_CMD            1500                             // The neutral point of thruster command
 #define THRUSTER_MAX_FWRD
 #define THRUSTER_MAX_BWRD
+#define DATA_AVAILABLE 0x01
+#define NO_DATA_AVAILABLE 0x00
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
 {
@@ -39,6 +41,8 @@ typedef struct
   uint8_t is_aiop_communication_allowed : 1;
   uint8_t is_streaming_enabled : 1;
   uint8_t is_computer_connected : 1;
+uint8_t is_new_data_available : 1;
+  
 }state_of_rov;
 
 typedef union _Data5
@@ -112,7 +116,7 @@ typedef struct
 
 typedef struct
 {
-  uint8_t volatile *pointer;
+  uint8_t  pointer[4];
   uint8_t volatile State;
 }VariableID;
 
@@ -137,7 +141,8 @@ typedef struct
   PelcoD_Message pelcod;
   pid_controller pid[6];
   Joystick joyst;
-  VariableID volatile identifiers_table[256];
+  VariableID  CAN_buffer[256];
+  uint8_t volatile *identifiers_table[256];
   state_of_rov rov_state;
   uint8_t Thruster_Angle;
   Control_Data Control;
@@ -162,6 +167,7 @@ void ROV_ControlMatrix_Init(ROV_Struct* ROV);
 void ROV_coldStart_Init(ROV_Struct* ROV);
 float map(float x, float in_min, float in_max, float out_min, float out_max);
 void communication_init(ROV_Struct* ROV,CanRxMsg RxMessage);
+void CAN_update(VariableID  *CAN_buff,uint8_t volatile  **identifiers_tab,state_of_rov *state);
 
 //Les fonctions suivantes sont utilisées pour le débogage
 char* conv_f2c(float f); // convert from float to char

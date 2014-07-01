@@ -147,8 +147,9 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   
-  //Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
- // Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);
+  Sensor_DataUpdate_50Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_50Hz,&ROV.rov_state);
+  Sensor_DataUpdate_10Hz(&ROV.measurement_unit_sensors,&ROV.aio.buffers.frame_10Hz,&ROV.rov_state);
+  CAN_update(ROV.CAN_buffer,ROV.identifiers_table,&ROV.rov_state);
   
 }
 /*******************************************************************************

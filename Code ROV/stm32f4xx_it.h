@@ -1,4 +1,4 @@
-/**
+/*
   ******************************************************************************
   * @file    TIM_PWM_Output/stm32f4xx_it.h 
   * @author  MCD Application Team

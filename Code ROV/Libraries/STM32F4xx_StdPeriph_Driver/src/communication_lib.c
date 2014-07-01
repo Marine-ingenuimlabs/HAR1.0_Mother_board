@@ -36,11 +36,12 @@ void ROV_Set_Var(ROV_Struct* ROV,CanRxMsg CAN_Msg)
     ROV->rov_state.is_variable_in_use = 1;
     for(uint8_t cnt=0;cnt<(CAN_Msg.DLC-1);cnt++)
     {
-      ROV->identifiers_table[CAN_Msg.Data[0]].pointer[(CAN_Msg.DLC-2)-cnt] = CAN_Msg.Data[cnt+1];
+      ROV->CAN_buffer[CAN_Msg.Data[0]].pointer[(CAN_Msg.DLC-2)-cnt] = CAN_Msg.Data[cnt+1];
     }
   ROV->rov_state.is_variable_in_use = 0;
+      ROV->rov_state.is_new_data_available = DATA_AVAILABLE;
   /*if (CAN_Msg.Data[0]>=45 && CAN_Msg.Data[0]<=51)
-        print_joystick(ROV); */
+        print_joystick(ROV); *//*
   if (CAN_Msg.Data[0]==48)
   {
      USART_puts(USART1,"THROTTLE_1\t");  
@@ -54,7 +55,7 @@ void ROV_Set_Var(ROV_Struct* ROV,CanRxMsg CAN_Msg)
           USART_SendData(USART1,'\n');
       }
     
-   
+   */
   //}
 }
 
@@ -137,8 +138,8 @@ void print_joystick(ROV_Struct* ROV )
 void Toggle_Var_Stream_State(ROV_Struct* ROV,CanRxMsg CAN_Msg)
 {
   
-    ROV->identifiers_table[CAN_Msg.Data[0]].State &= (CAN_Msg.Data[1]&0x01);
-    ROV->identifiers_table[CAN_Msg.Data[0]].State |= (CAN_Msg.Data[1]&0x01);
+    ROV->CAN_buffer[CAN_Msg.Data[0]].State &= (CAN_Msg.Data[1]&0x01);
+    ROV->CAN_buffer[CAN_Msg.Data[0]].State |= (CAN_Msg.Data[1]&0x01);
     
     
 }
@@ -157,7 +158,7 @@ void ROV_Req_Val(ROV_Struct* ROV,CanRxMsg CAN_Msg)
    // ROV->rov_state.is_variable_in_use = 1;
   if (CAN_Msg.ExtId>128)
   {
-    error_can = CAN_send(ROV->identifiers_table[CAN_Msg.ExtId-128].pointer,CAN_Msg.ExtId); //Send Requested Value Referenced in identifiers_table in Rov_Struct
+    error_can = CAN_send(ROV->CAN_buffer[CAN_Msg.ExtId-128].pointer,CAN_Msg.ExtId); //Send Requested Value Referenced in CAN_buffer in Rov_Struct
   }
     //ROV->rov_state.is_variable_in_use = 0;
   //}
@@ -175,9 +176,9 @@ void ROV_Stream_VAR(ROV_Struct ROV)
 { 
   for( int cnt = 0;cnt<256;cnt++) //for all the variables
   {
-    if (ROV.identifiers_table[cnt].State==1)
+    if (ROV.CAN_buffer[cnt].State==1)
     {  
-      error_can = CAN_send((ROV.identifiers_table[cnt].pointer),cnt); //Send
+      error_can = CAN_send((ROV.CAN_buffer[cnt].pointer),cnt); //Send
     } /*if the variable is enabled for stream */
   }
 }

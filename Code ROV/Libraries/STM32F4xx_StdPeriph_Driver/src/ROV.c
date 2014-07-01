@@ -31,6 +31,8 @@
 float joys[8];
 uint32_t u[8];
 float32_t Thruster_Axis_Projection;
+int count=0;
+
 /* Private function prototypes -----------------------------------------------*/
 /*******************************************************************************
 * Function Name  : ROV_VAR_Init
@@ -43,125 +45,132 @@ void ROV_VAR_Init(ROV_Struct* ROV_var)
 { 
   /* PelcoD ---------------------------- */ 
   /*This set of variables will not be used in this version 
-  ROV->identifiers_table[0].pointer = &ROV->PelcoD.sense;
-  ROV->identifiers_table[1].pointer = &ROV->PelcoD.toggle_automan;
-  ROV->identifiers_table[2].pointer = &ROV->PelcoD.toggle_onoff;
-  ROV->identifiers_table[3].pointer = &ROV->PelcoD.iris_close;
-  ROV->identifiers_table[4].pointer = &ROV->PelcoD.iris_open;
-  ROV->identifiers_table[5].pointer = &ROV->PelcoD.focus_near;
-  ROV->identifiers_table[6].pointer = &ROV->PelcoD.focus_far;
-  ROV->identifiers_table[7].pointer = &ROV->PelcoD.zoom_wide;
-  ROV->identifiers_table[8].pointer = &ROV->PelcoD.zoom_tele;
-  ROV->identifiers_table[9].pointer = &ROV->PelcoD.tilt_down;
-  ROV->identifiers_table[10].pointer = &ROV->PelcoD.tilt_up;
-  ROV->identifiers_table[11].pointer = &ROV->PelcoD.pan_left;
-  ROV->identifiers_table[12].pointer = &ROV->PelcoD.pan_right;
-  ROV->identifiers_table[13].pointer = &ROV->PelcoD.pan_speed;
-  ROV->identifiers_table[14].pointer = &ROV->PelcoD.tilt_speed;*/
+  ROV->identifiers_table[0] = &ROV->PelcoD.sense;
+  ROV->identifiers_table[1] = &ROV->PelcoD.toggle_automan;
+  ROV->identifiers_table[2] = &ROV->PelcoD.toggle_onoff;
+  ROV->identifiers_table[3] = &ROV->PelcoD.iris_close;
+  ROV->identifiers_table[4] = &ROV->PelcoD.iris_open;
+  ROV->identifiers_table[5] = &ROV->PelcoD.focus_near;
+  ROV->identifiers_table[6] = &ROV->PelcoD.focus_far;
+  ROV->identifiers_table[7] = &ROV->PelcoD.zoom_wide;
+  ROV->identifiers_table[8] = &ROV->PelcoD.zoom_tele;
+  ROV->identifiers_table[9] = &ROV->PelcoD.tilt_down;
+  ROV->identifiers_table[10] = &ROV->PelcoD.tilt_up;
+  ROV->identifiers_table[11] = &ROV->PelcoD.pan_left;
+  ROV->identifiers_table[12] = &ROV->PelcoD.pan_right;
+  ROV->identifiers_table[13] = &ROV->PelcoD.pan_speed;
+  ROV->identifiers_table[14] = &ROV->PelcoD.tilt_speed;*/
     /* Thrusters Angle ------------------------- */
-  ROV_var->identifiers_table[15].pointer = &ROV_var->Thruster_Angle; 
+  ROV_var->identifiers_table[15] = &ROV_var->Thruster_Angle; 
   /* Cam Angle pen ------------------------ */
-  //ROV_var->identifiers_table[30].pointer = ROV_var->CamAngle;
+  //ROV_var->identifiers_table[30] = ROV_var->CamAngle;
 
   /* Front light of ROV ------------------- */
-  ROV_var->identifiers_table[31].pointer = ROV_var->light.right.integer8;
-  ROV_var->identifiers_table[32].pointer = ROV_var->light.left.integer8;
+  ROV_var->identifiers_table[31] = ROV_var->light.right.integer8;
+  ROV_var->identifiers_table[32] = ROV_var->light.left.integer8;
   
   /* Thrusters ------------------------- */
-  ROV_var->identifiers_table[33].pointer = ROV_var->propulsion[0].speed_command.integer8;
-  ROV_var->identifiers_table[34].pointer = ROV_var->propulsion[1].speed_command.integer8;
-  ROV_var->identifiers_table[35].pointer = ROV_var->propulsion[2].speed_command.integer8;
-  ROV_var->identifiers_table[36].pointer = ROV_var->propulsion[3].speed_command.integer8;
-  ROV_var->identifiers_table[37].pointer = ROV_var->propulsion[4].speed_command.integer8;
-  ROV_var->identifiers_table[38].pointer = ROV_var->propulsion[5].speed_command.integer8;
-  ROV_var->identifiers_table[39].pointer = ROV_var->propulsion[0].speed_feedback.integer8;
-  ROV_var->identifiers_table[40].pointer = ROV_var->propulsion[1].speed_feedback.integer8;
-  ROV_var->identifiers_table[41].pointer = ROV_var->propulsion[2].speed_feedback.integer8;
-  ROV_var->identifiers_table[42].pointer = ROV_var->propulsion[3].speed_feedback.integer8;
-  ROV_var->identifiers_table[43].pointer = ROV_var->propulsion[4].speed_feedback.integer8;
-  ROV_var->identifiers_table[44].pointer = ROV_var->propulsion[5].speed_feedback.integer8;
+  ROV_var->identifiers_table[33] = ROV_var->propulsion[0].speed_command.integer8;
+  ROV_var->identifiers_table[34] = ROV_var->propulsion[1].speed_command.integer8;
+  ROV_var->identifiers_table[35] = ROV_var->propulsion[2].speed_command.integer8;
+  ROV_var->identifiers_table[36] = ROV_var->propulsion[3].speed_command.integer8;
+  ROV_var->identifiers_table[37] = ROV_var->propulsion[4].speed_command.integer8;
+  ROV_var->identifiers_table[38] = ROV_var->propulsion[5].speed_command.integer8;
+  ROV_var->identifiers_table[39] = ROV_var->propulsion[0].speed_feedback.integer8;
+  ROV_var->identifiers_table[40] = ROV_var->propulsion[1].speed_feedback.integer8;
+  ROV_var->identifiers_table[41] = ROV_var->propulsion[2].speed_feedback.integer8;
+  ROV_var->identifiers_table[42] = ROV_var->propulsion[3].speed_feedback.integer8;
+  ROV_var->identifiers_table[43] = ROV_var->propulsion[4].speed_feedback.integer8;
+  ROV_var->identifiers_table[44] = ROV_var->propulsion[5].speed_feedback.integer8;
   
   /* Joystick ---------------------------*/
-  ROV_var->identifiers_table[45].pointer = ROV_var->joyst.x_axis.integer8;
-  ROV_var->identifiers_table[46].pointer = ROV_var->joyst.y_axis.integer8;
-  ROV_var->identifiers_table[47].pointer = ROV_var->joyst.rz_rotation.integer8;
-  ROV_var->identifiers_table[48].pointer = ROV_var->joyst.throttle_1.integer8;
-  ROV_var->identifiers_table[49].pointer = ROV_var->joyst.throttle_2.integer8;
-  ROV_var->identifiers_table[50].pointer = ROV_var->joyst.pov.integer8;
-  ROV_var->identifiers_table[51].pointer = ROV_var->joyst.buttons.integer8;
+  ROV_var->identifiers_table[45] = ROV_var->joyst.x_axis.integer8;
+  ROV_var->identifiers_table[46] = ROV_var->joyst.y_axis.integer8;
+  ROV_var->identifiers_table[47] = ROV_var->joyst.rz_rotation.integer8;
+  ROV_var->identifiers_table[48] = ROV_var->joyst.throttle_1.integer8;
+  ROV_var->identifiers_table[49] = ROV_var->joyst.throttle_2.integer8;
+  ROV_var->identifiers_table[50] = ROV_var->joyst.pov.integer8;
+  ROV_var->identifiers_table[51] = ROV_var->joyst.buttons.integer8;
   
   /* Magnetometer offsets -------------- */
-  ROV_var->identifiers_table[52].pointer = ROV_var->measurement_unit_sensors.AHRS.Mag.x_offset.integer;
-  ROV_var->identifiers_table[53].pointer = ROV_var->measurement_unit_sensors.AHRS.Mag.y_offset.integer;
-  ROV_var->identifiers_table[54].pointer = ROV_var->measurement_unit_sensors.AHRS.Mag.z_offset.integer;
+  ROV_var->identifiers_table[52] = ROV_var->measurement_unit_sensors.AHRS.Mag.x_offset.integer;
+  ROV_var->identifiers_table[53] = ROV_var->measurement_unit_sensors.AHRS.Mag.y_offset.integer;
+  ROV_var->identifiers_table[54] = ROV_var->measurement_unit_sensors.AHRS.Mag.z_offset.integer;
   
   /* Magnetometer value ---------------- */
-   ROV_var->identifiers_table[55].pointer = ROV_var->measurement_unit_sensors.AHRS.Mag.x_value.integer;
-   ROV_var->identifiers_table[56].pointer = ROV_var->measurement_unit_sensors.AHRS.Mag.y_value.integer;
-   ROV_var->identifiers_table[57].pointer = ROV_var->measurement_unit_sensors.AHRS.Mag.z_value.integer;
+   ROV_var->identifiers_table[55] = ROV_var->measurement_unit_sensors.AHRS.Mag.x_value.integer;
+   ROV_var->identifiers_table[56] = ROV_var->measurement_unit_sensors.AHRS.Mag.y_value.integer;
+   ROV_var->identifiers_table[57] = ROV_var->measurement_unit_sensors.AHRS.Mag.z_value.integer;
    
    /* Gyro Variables --------------------- */
-  ROV_var->identifiers_table[74].pointer = ROV_var->measurement_unit_sensors.AHRS.Gyro.x_value.integer;
-  ROV_var->identifiers_table[75].pointer = ROV_var->measurement_unit_sensors.AHRS.Gyro.y_value.integer;
-  ROV_var->identifiers_table[76].pointer = ROV_var->measurement_unit_sensors.AHRS.Gyro.z_value.integer;
+  ROV_var->identifiers_table[74] = ROV_var->measurement_unit_sensors.AHRS.Gyro.x_value.integer;
+  ROV_var->identifiers_table[75] = ROV_var->measurement_unit_sensors.AHRS.Gyro.y_value.integer;
+  ROV_var->identifiers_table[76] = ROV_var->measurement_unit_sensors.AHRS.Gyro.z_value.integer;
   
   /* Accelerometer variables ------------ */
-  ROV_var->identifiers_table[77].pointer = ROV_var->measurement_unit_sensors.AHRS.Accel.x_value.integer;
-  ROV_var->identifiers_table[78].pointer = ROV_var->measurement_unit_sensors.AHRS.Accel.y_value.integer;
-  ROV_var->identifiers_table[79].pointer = ROV_var->measurement_unit_sensors.AHRS.Accel.z_value.integer;
+  ROV_var->identifiers_table[77] = ROV_var->measurement_unit_sensors.AHRS.Accel.x_value.integer;
+  ROV_var->identifiers_table[78] = ROV_var->measurement_unit_sensors.AHRS.Accel.y_value.integer;
+  ROV_var->identifiers_table[79] = ROV_var->measurement_unit_sensors.AHRS.Accel.z_value.integer;
   
   /* Euler Angles ---------------------- */
-  ROV_var->identifiers_table[80].pointer = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.x_value.integer;
-  ROV_var->identifiers_table[81].pointer = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.y_value.integer;
-  ROV_var->identifiers_table[82].pointer = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.z_value.integer;
+  ROV_var->identifiers_table[80] = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.x_value.integer;
+  ROV_var->identifiers_table[81] = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.y_value.integer;
+  ROV_var->identifiers_table[82] = ROV_var->measurement_unit_sensors.AHRS.Euler_Angle.z_value.integer;
   
   /* Depth ----------------------------- */
-  ROV_var->identifiers_table[83].pointer = ROV_var->measurement_unit_sensors.Pressure.integer;
+  ROV_var->identifiers_table[83] = ROV_var->measurement_unit_sensors.Pressure.integer;
   
     /* pid Parameters ------------------- */
-  ROV_var->identifiers_table[84].pointer = ROV_var->pid[0].Kp.integer;
-  ROV_var->identifiers_table[85].pointer = ROV_var->pid[1].Kp.integer;
-  ROV_var->identifiers_table[86].pointer = ROV_var->pid[2].Kp.integer;
-  ROV_var->identifiers_table[87].pointer = ROV_var->pid[3].Kp.integer;
-  ROV_var->identifiers_table[88].pointer = ROV_var->pid[4].Kp.integer;
-  ROV_var->identifiers_table[89].pointer = ROV_var->pid[5].Kp.integer;
-  ROV_var->identifiers_table[90].pointer = ROV_var->pid[0].Ki.integer;
-  ROV_var->identifiers_table[91].pointer = ROV_var->pid[1].Ki.integer;
-  ROV_var->identifiers_table[92].pointer = ROV_var->pid[2].Ki.integer;
-  ROV_var->identifiers_table[93].pointer = ROV_var->pid[3].Ki.integer;
-  ROV_var->identifiers_table[94].pointer = ROV_var->pid[4].Ki.integer;
-  ROV_var->identifiers_table[95].pointer = ROV_var->pid[5].Ki.integer;
-  ROV_var->identifiers_table[96].pointer = ROV_var->pid[0].Kd.integer;
-  ROV_var->identifiers_table[97].pointer = ROV_var->pid[1].Kd.integer;
-  ROV_var->identifiers_table[98].pointer = ROV_var->pid[2].Kd.integer;
-  ROV_var->identifiers_table[99].pointer = ROV_var->pid[3].Kd.integer;
-  ROV_var->identifiers_table[100].pointer = ROV_var->pid[4].Kd.integer;
-  ROV_var->identifiers_table[101].pointer = ROV_var->pid[5].Kd.integer;
+  ROV_var->identifiers_table[84] = ROV_var->pid[0].Kp.integer;
+  ROV_var->identifiers_table[85] = ROV_var->pid[1].Kp.integer;
+  ROV_var->identifiers_table[86] = ROV_var->pid[2].Kp.integer;
+  ROV_var->identifiers_table[87] = ROV_var->pid[3].Kp.integer;
+  ROV_var->identifiers_table[88] = ROV_var->pid[4].Kp.integer;
+  ROV_var->identifiers_table[89] = ROV_var->pid[5].Kp.integer;
+  ROV_var->identifiers_table[90] = ROV_var->pid[0].Ki.integer;
+  ROV_var->identifiers_table[91] = ROV_var->pid[1].Ki.integer;
+  ROV_var->identifiers_table[92] = ROV_var->pid[2].Ki.integer;
+  ROV_var->identifiers_table[93] = ROV_var->pid[3].Ki.integer;
+  ROV_var->identifiers_table[94] = ROV_var->pid[4].Ki.integer;
+  ROV_var->identifiers_table[95] = ROV_var->pid[5].Ki.integer;
+  ROV_var->identifiers_table[96] = ROV_var->pid[0].Kd.integer;
+  ROV_var->identifiers_table[97] = ROV_var->pid[1].Kd.integer;
+  ROV_var->identifiers_table[98] = ROV_var->pid[2].Kd.integer;
+  ROV_var->identifiers_table[99] = ROV_var->pid[3].Kd.integer;
+  ROV_var->identifiers_table[100] = ROV_var->pid[4].Kd.integer;
+  ROV_var->identifiers_table[101] = ROV_var->pid[5].Kd.integer;
   
   /* Current and Voltage -------------- */
-  ROV_var->identifiers_table[102].pointer = ROV_var->measurement_unit_sensors.Current.integer;
-  ROV_var->identifiers_table[103].pointer = ROV_var->measurement_unit_sensors.Voltage.integer;
+  ROV_var->identifiers_table[102] = ROV_var->measurement_unit_sensors.Current.integer;
+  ROV_var->identifiers_table[103] = ROV_var->measurement_unit_sensors.Voltage.integer;
   
   /* Temperature -------------- */
-  ROV_var->identifiers_table[104].pointer = ROV_var->measurement_unit_sensors.Onboard_Temprature.integer;
-  ROV_var->identifiers_table[105].pointer = ROV_var->measurement_unit_sensors.Water_Temprature.integer;
+  ROV_var->identifiers_table[104] = ROV_var->measurement_unit_sensors.Onboard_Temprature.integer;
+  ROV_var->identifiers_table[105] = ROV_var->measurement_unit_sensors.Water_Temprature.integer;
   
  for(int cnt=0;cnt<ID_TABLE_LENGTH ;cnt++) //Set all the variables OFF from stream and initialize them at 0
  {
-   ROV_var->identifiers_table[cnt].State = 0;
+   ROV_var->CAN_buffer[cnt].State = 0;
     if(_IS_AN_ONE_BYTE_VARIABLE(cnt))
     {
-     ROV_var->identifiers_table[cnt].pointer[0] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[0] = 0;
+    /* ROV_var->CAN_buffer[0][cnt] = 0;*/
      }/* if size if one octet */
     if(_IS_A_TWO_BYTES_VARIABLE(cnt)){
-     ROV_var->identifiers_table[cnt].pointer[0] = 0;
-     ROV_var->identifiers_table[cnt].pointer[1] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[0] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[1] = 0;
+    /* ROV_var->CAN_buffer[0][cnt] = 0;
+     ROV_var->CAN_buffer[1][cnt] = 0;*/
    }/* if size if two octet */
     if(_IS_A_FOUR_BYTES_VARIABLE(cnt)){
-     ROV_var->identifiers_table[cnt].pointer[0] = 0;
-     ROV_var->identifiers_table[cnt].pointer[1] = 0;
-     ROV_var->identifiers_table[cnt].pointer[3] = 0;
-     ROV_var->identifiers_table[cnt].pointer[4] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[0] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[1] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[2] = 0;
+     ROV_var->CAN_buffer[cnt].pointer[3] = 0;
+     /*ROV_var->CAN_buffer[0][cnt] = 0;
+     ROV_var->CAN_buffer[1][cnt] = 0;
+     ROV_var->CAN_buffer[2][cnt] = 0;
+     ROV_var->CAN_buffer[3][cnt] = 0;*/
    }/* if size if four octet */
  }
 }
@@ -409,6 +418,7 @@ void Sensor_DataUpdate_50Hz(Sensors *destination,AIOP_50HZMessage volatile *sour
     destination->AHRS.Gyro.z_value.floating_number = source->Gyroz.floating_number;
     source->state = IDLE;
     state->is_variable_in_use = 0;
+    state->is_new_data_available = DATA_AVAILABLE;
   } /* if new data is ready to be copied */
 }
 
@@ -423,8 +433,7 @@ void Sensor_DataUpdate_10Hz(Sensors *destination,AIOP_10HZMessage volatile *sour
 {
    if(source->state == DATA_READY)
   {
-       //if( state->is_variable_in_use == 0)
-   //{
+    {
     state->is_variable_in_use = 1;
     source->state = DATA_PROCESSING;
     /* Updating current and voltage --------------- */
@@ -437,10 +446,10 @@ void Sensor_DataUpdate_10Hz(Sensors *destination,AIOP_10HZMessage volatile *sour
     destination->Pressure.floating_number = source->Pressure.floating_number;
     source->state = IDLE;
     state->is_variable_in_use = 0;
-   //}
+    state->is_new_data_available = DATA_AVAILABLE;
   } /* if new data is ready to be copied */
 }
-
+}
 /*******************************************************************************
 * Function Name  : update_pelcod_values
 * Description    : send pelcoD values to the cam
@@ -506,25 +515,73 @@ void ROV_coldStart_Init(ROV_Struct* ROV)
     ROV->joyst.pov.integer16=0;
     ROV->rov_state.is_streaming_enabled = 0;
     ROV->rov_state.is_computer_connected = 0;
-    ROV->measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number = 5.3;
-    ROV->measurement_unit_sensors.AHRS.Euler_Angle.y_value.floating_number = 9.6;
-    ROV->measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number = 7.1;
-    ROV->measurement_unit_sensors.Pressure.floating_number=28.65;
-    ROV->identifiers_table[80].State = 1;
-    ROV->identifiers_table[81].State = 1;
-    ROV->identifiers_table[82].State = 1;
-    ROV->identifiers_table[83].State = 1;
-    ROV->identifiers_table[39].State = 1;
-    ROV->identifiers_table[40].State = 1;
-    ROV->identifiers_table[41].State = 1;
-    ROV->identifiers_table[42].State = 1;
-    ROV->identifiers_table[43].State = 1;
-    ROV->identifiers_table[44].State = 1;
+    //ROV->measurement_unit_sensors.AHRS.Euler_Angle.x_value.floating_number = 5.3;
+    //ROV->measurement_unit_sensors.AHRS.Euler_Angle.y_value.floating_number = 9.6;
+    //ROV->measurement_unit_sensors.AHRS.Euler_Angle.z_value.floating_number = 7.1;
+    //ROV->measurement_unit_sensors.Pressure.floating_number=28.65;
+    ROV->CAN_buffer[80].State = 1;
+    ROV->CAN_buffer[81].State = 1;
+    ROV->CAN_buffer[82].State = 1;
+    ROV->CAN_buffer[83].State = 1;
+    ROV->CAN_buffer[39].State = 1;
+    ROV->CAN_buffer[40].State = 1;
+    ROV->CAN_buffer[41].State = 1;
+    ROV->CAN_buffer[42].State = 1;
+    ROV->CAN_buffer[43].State = 1;
+    ROV->CAN_buffer[44].State = 1;
     //ROV->light.right.integer16 = 50;
     ROV->Thruster_Angle=DEFAULT_THRUSTERS_ANGLE;
     THRUSTER_update(ROV->propulsion);
 }
 
+void CAN_update(VariableID *CAN_buff,uint8_t volatile **identifiers_tab,state_of_rov *state)
+{
+  if((state->is_new_data_available) == DATA_AVAILABLE)
+  {
+  for(count=0;count<ID_TABLE_LENGTH ;count++) //Set all the variables OFF from stream and initialize them at 0
+ {
+   if(((count<39)&&(count>=0))||((count<52)&&(count>44)))//down variables
+   {
+             if(_IS_AN_ONE_BYTE_VARIABLE(count)){
+     identifiers_tab[count][0] = CAN_buff[count].pointer[0];
+     }/* if size if one octet */
+    if(_IS_A_TWO_BYTES_VARIABLE(count)){
+     identifiers_tab[count][0] = CAN_buff[count].pointer[0];
+     identifiers_tab[count][1] = CAN_buff[count].pointer[1];
+   }/* if size if two octet */
+    if(_IS_A_FOUR_BYTES_VARIABLE(count)){
+     identifiers_tab[count][0] = (uint8_t) CAN_buff[count].pointer[0];
+     identifiers_tab[count][1] = (uint8_t) CAN_buff[count].pointer[1];
+     identifiers_tab[count][2] = (uint8_t) CAN_buff[count].pointer[2];
+     identifiers_tab[count][3] = (uint8_t) CAN_buff[count].pointer[3];
+   }/* if size if four octet */
+   
+
+   }
+   else
+      {
+    if(_IS_AN_ONE_BYTE_VARIABLE(count))
+    {
+     CAN_buff[count].pointer[0] = identifiers_tab[count][0];
+     }/* if size if one octet */
+    if(_IS_A_TWO_BYTES_VARIABLE(count)){
+     CAN_buff[count].pointer[0] = identifiers_tab[count][0];
+     CAN_buff[count].pointer[1] = identifiers_tab[count][1];
+   }/* if size if two octet */
+    if(_IS_A_FOUR_BYTES_VARIABLE(count)){
+     CAN_buff[count].pointer[0] = identifiers_tab[count][0];
+     CAN_buff[count].pointer[1] = identifiers_tab[count][1];
+     CAN_buff[count].pointer[2] = identifiers_tab[count][2];
+     CAN_buff[count].pointer[3] = identifiers_tab[count][3];
+   }/* if size if four octet */
+ }
+ 
+ 
+}
+
+  (state->is_new_data_available) = NO_DATA_AVAILABLE;
+}
+}
 /*******************************************************************************
 * Function Name  : map
 * Description    : Variable range remapping 

@@ -20,7 +20,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=-529331800
+Checksum=167400720
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -48,21 +48,24 @@ ITMlogFile=$PROJ_DIR$\ITM.log
 [RegisterFilter]
 FilePath=_ ""
 UseFilter=_ 0
+[struct_types]
+Fmt0=union_float-floating_number	4	0
 [array_types]
-Fmt0=uint8_t[4]	3	0
+Fmt0=uint8_t[4]	4	0
 Fmt1=uint8_t[8]	3	0
 [watch_formats]
 Fmt0={W}0:*s	3	0
-Fmt1={W}0:ROV.Motion.Roll.floating_number	0	7
-Fmt2={W}0:Rx.Data	0	7
-Fmt3={W}0:TransmitMailbox	3	0
-Fmt4={W}0:UART_Counter	3	0
-Fmt5={W}0:exampl	0	7
-Fmt6={W}0:exampl1	0	7
-Fmt7={W}0:message_DOF	0	7
-Fmt8={W}0:s	0	7
-Fmt9={W}0:tableau[1][2]	3	0
-Fmt10={W}0:tt	4	0
+Fmt1={W}0:CAN_buff[count].pointer[0]	4	0
+Fmt2={W}0:ROV.Motion.Roll.floating_number	0	7
+Fmt3={W}0:Rx.Data	0	7
+Fmt4={W}0:TransmitMailbox	3	0
+Fmt5={W}0:UART_Counter	3	0
+Fmt6={W}0:exampl	0	7
+Fmt7={W}0:exampl1	0	7
+Fmt8={W}0:message_DOF	0	7
+Fmt9={W}0:s	0	7
+Fmt10={W}0:tableau[1][2]	3	0
+Fmt11={W}0:tt	4	0
 [SWOTraceWindow]
 PcSampling=0
 InterruptLogs=0
@@ -103,7 +106,9 @@ Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Libraries\STM32F4xx_StdPeriph_Driver\src\ROV.c}.367.4" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\Libraries\STM32F4xx_StdPeriph_Driver\src\ROV.c}.376.6" 0 0 1 "" 0 "" 0
+Count=2
 [Aliases]
 Count=0
 SuppressDialog=0
